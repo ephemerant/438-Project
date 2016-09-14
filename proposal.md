@@ -5,3 +5,6 @@ As this is a networking-centric class, we will focus on packet security and veri
 A link to an example of a basic “Tic Tac Toe” game that uses TCP sockets can be found below, which we will study and use as a basic reference model:
 
 http://www.codeproject.com/Articles/6574/C-TicTacToe-with-AI-and-network-support
+
+
+testing!
