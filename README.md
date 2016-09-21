@@ -2,4 +2,4 @@
 UNO
 
 * Java
-* [http://slick.ninjacave.com/](Slick 2D)
+* [Slick 2D](http://slick.ninjacave.com/)
