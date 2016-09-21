@@ -1,2 +1,5 @@
 # 438-Project
-UNO?
+UNO
+
+* Java
+* [http://slick.ninjacave.com/](Slick 2D)
