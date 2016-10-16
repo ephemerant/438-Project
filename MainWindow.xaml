@@ -5,11 +5,42 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UNO"
         mc:Ignorable="d"
-        Title="UNO" Height="700" Width="700" Background="Green" Loaded="Window_Loaded" ResizeMode="CanMinimize" Icon="wild.ico">
+        Title="UNO" Height="550" Width="900" Loaded="Window_Loaded" ResizeMode="CanMinimize" Icon="wild.ico">
+    <Window.Background>
+        <ImageBrush ImageSource="felt.png" TileMode="Tile">
+            <ImageBrush.RelativeTransform>
+                <TransformGroup>
+                    <ScaleTransform CenterY="0.5" CenterX="0.5" ScaleX="0.5" ScaleY="0.5"/>
+                    <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                    <RotateTransform CenterY="0.5" CenterX="0.5"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </ImageBrush.RelativeTransform>
+        </ImageBrush>
+    </Window.Background>
     <Grid>
-        <Canvas Name="canvas"
+        <Canvas x:Name="players" Canvas.Left="734" HorizontalAlignment="Right" Width="200">
+            <Canvas.Background>
+                <SolidColorBrush Color="Black" Opacity="0.5"/>
+            </Canvas.Background>
+        </Canvas>
+        <Canvas x:Name="hand" Margin="0,369,200,0">
+            <Canvas.Background>
+                <ImageBrush ImageSource="wood.png" TileMode="Tile" Stretch="UniformToFill">
+                    <ImageBrush.RelativeTransform>
+                        <TransformGroup>
+                            <ScaleTransform CenterY="0.5" CenterX="0.5" ScaleX="0.5" ScaleY="0.5"/>
+                            <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                            <RotateTransform CenterY="0.5" CenterX="0.5"/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </ImageBrush.RelativeTransform>
+                </ImageBrush>
+            </Canvas.Background>
+        </Canvas>
+        <Canvas x:Name="canvas"
                 MouseLeftButtonDown="CanvasMouseLeftButtonDown"
                 MouseLeftButtonUp="CanvasMouseLeftButtonUp"
-                MouseMove="CanvasMouseMove"></Canvas>
+                MouseMove="CanvasMouseMove"/>
     </Grid>
 </Window>

@@ -49,9 +49,6 @@ namespace UNO
 
             foreach (var path in Directory.GetFiles(imagesPath))
             {
-                if (Path.GetFileNameWithoutExtension(path) == "blank")
-                    continue;
-
                 // Two of each card
                 for (var i = 1; i <= 2; ++i)
                     dealer.AddToDeck(new Card(path));
@@ -60,16 +57,39 @@ namespace UNO
             dealer.Shuffle();
             dealer.Deal(player, 7);
 
-            int offset = 0;
+            int offset = 33;
 
-            foreach(var card in player.hand)
+            foreach (var card in player.hand)
             {
-                offset += 30;
-
-                Canvas.SetTop(card.image, offset);
+                Canvas.SetTop(card.image, 385);
                 Canvas.SetLeft(card.image, offset);
 
                 canvas.Children.Add(card.image);
+
+                offset += 90;
+            }
+
+            var names = new string[] { "Player 1", "Dr. Doyle", "Morpheus", "Terminator", "Citizen", "Kane", "Will Smith", "Player 8", "Iron Maiden", "Final Boss" };
+
+            offset = 0;
+
+            var rng = new Random();
+
+            foreach (var name in names)
+            {
+                var labelName = new Label { Content = name, Foreground = Brushes.White, FontSize = 20 };
+                Canvas.SetTop(labelName, offset);
+                Canvas.SetLeft(labelName, 10);
+                players.Children.Add(labelName);
+
+                int numCards = rng.Next(1, 8); // upper bound non-inclusive
+
+                var labelCards = new Label { Content = string.Format("{0} card{1}", numCards, numCards > 1 ? "s" : ""), Foreground = Brushes.White, FontSize = 14 };
+                Canvas.SetTop(labelCards, offset + 25);
+                Canvas.SetLeft(labelCards, 10);
+                players.Children.Add(labelCards);
+
+                offset += 50;
             }
         }
 
