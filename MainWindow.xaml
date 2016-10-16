@@ -1,11 +1,11 @@
-﻿<Window x:Class="UNO_WPF.MainWindow"
+﻿<Window x:Class="UNO.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:UNO_WPF"
+        xmlns:local="clr-namespace:UNO"
         mc:Ignorable="d"
-        Title="UNO" Height="600" Width="600" Background="Green" Loaded="Window_Loaded" ResizeMode="CanMinimize" Icon="wild.ico">
+        Title="UNO" Height="700" Width="700" Background="Green" Loaded="Window_Loaded" ResizeMode="CanMinimize" Icon="wild.ico">
     <Grid>
         <Canvas Name="canvas"
                 MouseLeftButtonDown="CanvasMouseLeftButtonDown"

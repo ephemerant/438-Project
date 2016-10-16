@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.IO;
 
-namespace UNO_WPF
+namespace UNO
 {
     public partial class MainWindow : Window
     {
@@ -23,8 +23,9 @@ namespace UNO_WPF
         Image draggedImage;
         // The mouse's last position, used to prevent "jumping" during image dragging
         Point mousePosition;
-        // The global scale factor of all cards
-        double cardScale = 0.75;
+
+        Dealer dealer;
+        Player player;
 
         public MainWindow()
         {
@@ -33,7 +34,10 @@ namespace UNO_WPF
 
         void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // first path is for general distribution, second is for when debugging
+            dealer = new Dealer();
+            player = new Player();
+
+            // First path is for general distribution, second is for when debugging
             string[] possibleDirectories = { @"resources\cards", @"..\..\resources\cards" };
 
             foreach (var dir in possibleDirectories)
@@ -43,29 +47,29 @@ namespace UNO_WPF
                     break;
                 }
 
-            string[] cards = new string[] { "blue_0.png", "red_5.png", "wild.png", "green_reverse.png", "yellow_skip.png" };
-
-            int offSet = 0;
-
-            foreach (var cardName in cards)
+            foreach (var path in Directory.GetFiles(imagesPath))
             {
-                // For now, display each card on top of the previous, shifted down and to the right by 30px in the X and Y directions
-                offSet += 30;
+                if (Path.GetFileNameWithoutExtension(path) == "blank")
+                    continue;
 
-                // Load the card's image
-                BitmapImage src = new BitmapImage();
-                src.BeginInit();
-                src.UriSource = new Uri(Path.Combine(imagesPath, cardName));
-                src.EndInit();
+                // Two of each card
+                for (var i = 1; i <= 2; ++i)
+                    dealer.AddToDeck(new Card(path));
+            }
 
-                Image i = new Image { Source = src, Width = 100 * cardScale, Height = 150 * cardScale };
+            dealer.Shuffle();
+            dealer.Deal(player, 7);
 
-                // Position the card on the screen
-                Canvas.SetLeft(i, offSet);
-                Canvas.SetTop(i, offSet);
+            int offset = 0;
 
-                // Display the card by adding it to the canvas
-                canvas.Children.Add(i);
+            foreach(var card in player.hand)
+            {
+                offset += 30;
+
+                Canvas.SetTop(card.image, offset);
+                Canvas.SetLeft(card.image, offset);
+
+                canvas.Children.Add(card.image);
             }
         }
 
@@ -83,8 +87,8 @@ namespace UNO_WPF
             double relativeOffsetX = (centerX - mousePosition.X) / draggedImage.Width;
             double relativeOffsetY = (centerY - mousePosition.Y) / draggedImage.Height;
 
-            draggedImage.Width = 100 * cardScale * scale;
-            draggedImage.Height = 150 * cardScale * scale;
+            draggedImage.Width = 100 * Card.cardScale * scale;
+            draggedImage.Height = 150 * Card.cardScale * scale;
 
             BringToFront(draggedImage);
 
