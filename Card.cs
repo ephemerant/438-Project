@@ -30,18 +30,11 @@ namespace UNO
 
         public Card(string path)
         {
-            string name = Path.GetFileNameWithoutExtension(path);
+            image = Shared.LoadImage(path, 100 * cardScale, 150 * cardScale);
 
             // Pull color & value from the file name
-            LoadType(name);
-
-            // Load the image
-            BitmapImage src = new BitmapImage();
-            src.BeginInit();
-            src.UriSource = new Uri(path);
-            src.EndInit();
-
-            image = new Image { Source = src, Width = 100 * cardScale, Height = 150 * cardScale };
+            string name = Path.GetFileNameWithoutExtension(path);
+            LoadType(name);            
         }
 
         void LoadType(string name)

@@ -17,12 +17,15 @@ namespace UNO
 {
     public partial class MainWindow : Window
     {
+        string resourcesPath;
         string imagesPath;
 
         // The image (card) currently being dragged by the mouse
         Image draggedImage;
         // The mouse's last position, used to prevent "jumping" during image dragging
         Point mousePosition;
+
+        List<Image> arrows = new List<Image>();
 
         Dealer dealer;
         Player player;
@@ -38,12 +41,13 @@ namespace UNO
             player = new Player();
 
             // First path is for general distribution, second is for when debugging
-            string[] possibleDirectories = { @"resources\cards", @"..\..\resources\cards" };
+            string[] possibleDirectories = { @"resources", @"..\..\resources" };
 
             foreach (var dir in possibleDirectories)
                 if (Directory.Exists(dir))
                 {
-                    imagesPath = Path.GetFullPath(dir);
+                    resourcesPath = Path.GetFullPath(dir);
+                    imagesPath = Path.Combine(resourcesPath, "cards");
                     break;
                 }
 
@@ -57,7 +61,7 @@ namespace UNO
             dealer.Shuffle();
             dealer.Deal(player, 7);
 
-            int offset = 33;
+            int offset = 50;
 
             foreach (var card in player.hand)
             {
@@ -66,9 +70,31 @@ namespace UNO
 
                 canvas.Children.Add(card.image);
 
-                offset += 90;
+                offset += 85;
             }
 
+            // Arrows
+            var arrow = Shared.LoadImage(Path.Combine(resourcesPath, "arrow-right.png"), 25, 45);
+            arrow.Opacity = 0.5;
+            Canvas.SetTop(arrow, 45);
+            Canvas.SetRight(arrow, 10);
+            hand.Children.Add(arrow);
+            arrows.Add(arrow);
+
+            arrow.MouseEnter += ArrowBeginHover;
+            arrow.MouseLeave += ArrowEndHover;
+
+            arrow = Shared.LoadImage(Path.Combine(resourcesPath, "arrow-left.png"), 25, 45);
+            arrow.Opacity = 0.5;
+            Canvas.SetTop(arrow, 45);
+            Canvas.SetLeft(arrow, 10);
+            hand.Children.Add(arrow);
+            arrows.Add(arrow);
+
+            arrow.MouseEnter += ArrowBeginHover;
+            arrow.MouseLeave += ArrowEndHover;
+
+            // Simulate players
             var names = new string[] { "Player 1", "Dr. Doyle", "Morpheus", "Terminator", "Citizen", "Kane", "Will Smith", "Player 8", "Iron Maiden", "Final Boss" };
 
             offset = 0;
@@ -90,6 +116,24 @@ namespace UNO
                 players.Children.Add(labelCards);
 
                 offset += 50;
+            }
+        }
+
+        private void ArrowEndHover(object sender, MouseEventArgs e)
+        {
+            if (e.Source != null)
+            {
+                var image = (Image)e.Source;
+                image.Opacity = 0.5;
+            }
+        }
+
+        private void ArrowBeginHover(object sender, MouseEventArgs e)
+        {
+            if (e.Source != null)
+            {
+                var image = (Image)e.Source;
+                image.Opacity = 0.9;
             }
         }
 
