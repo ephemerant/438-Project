@@ -20,6 +20,11 @@ namespace UNO
         string resourcesPath;
         string imagesPath;
 
+        // The mouse's last position, used to prevent "jumping" during image dragging
+        Point mousePosition;
+
+        List<Image> menuButtons = new List<Image>();
+
         public MenuWindow()
         {
             InitializeComponent();
@@ -37,6 +42,43 @@ namespace UNO
                     break;
                 }
 
+            //load host button
+            var hostButton = Shared.LoadImage(Path.Combine(resourcesPath, "hostGame.png"), 395, 81);
+            Canvas.SetTop(hostButton, 160);
+            Canvas.SetLeft(hostButton, 200);
+            canvas.Children.Add(hostButton);
+            menuButtons.Add(hostButton);
+
+            //load join button
+            var joinButton = Shared.LoadImage(Path.Combine(resourcesPath, "joinGame.png"), 395, 85);
+            Canvas.SetTop(joinButton, 250);
+            Canvas.SetLeft(joinButton, 200);
+            canvas.Children.Add(joinButton);
+            menuButtons.Add(joinButton);
+
+            //load quit button
+            var quitButton = Shared.LoadImage(Path.Combine(resourcesPath, "quit.png"),166, 87);
+            Canvas.SetTop(quitButton, 340);
+            Canvas.SetLeft(quitButton, 200);
+            canvas.Children.Add(quitButton);
+            menuButtons.Add(quitButton);
+
         }
+
+        void CanvasMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            
+        }
+
+        void CanvasMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            
+        }
+
+        void CanvasMouseMove(object sender, MouseEventArgs e)
+        {
+            
+        }
+
     }
 }

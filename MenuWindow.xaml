@@ -19,5 +19,9 @@
         </ImageBrush>
     </Window.Background>
     <Grid>
+        <Canvas x:Name="canvas"
+                MouseLeftButtonDown="CanvasMouseLeftButtonDown"
+                MouseLeftButtonUp="CanvasMouseLeftButtonUp"
+                MouseMove="CanvasMouseMove"/>
     </Grid>
 </Window>
