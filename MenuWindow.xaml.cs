@@ -20,9 +20,6 @@ namespace UNO
         string resourcesPath;
         string imagesPath;
 
-        // The mouse's last position, used to prevent "jumping" during image dragging
-        Point mousePosition;
-
         List<Image> menuButtons = new List<Image>();
 
         public MenuWindow()
@@ -49,12 +46,16 @@ namespace UNO
             canvas.Children.Add(hostButton);
             menuButtons.Add(hostButton);
 
+            hostButton.MouseLeftButtonDown += hostButtonClick;
+
             //load join button
             var joinButton = Shared.LoadImage(Path.Combine(resourcesPath, "joinGame.png"), 395, 85);
             Canvas.SetTop(joinButton, 250);
             Canvas.SetLeft(joinButton, 200);
             canvas.Children.Add(joinButton);
             menuButtons.Add(joinButton);
+
+            joinButton.MouseLeftButtonDown += joinButtonClick;
 
             //load quit button
             var quitButton = Shared.LoadImage(Path.Combine(resourcesPath, "quit.png"),166, 87);
@@ -63,11 +64,13 @@ namespace UNO
             canvas.Children.Add(quitButton);
             menuButtons.Add(quitButton);
 
+            quitButton.MouseLeftButtonDown += quitButtonClick;
+
         }
 
         void CanvasMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            
+                 
         }
 
         void CanvasMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -78,6 +81,25 @@ namespace UNO
         void CanvasMouseMove(object sender, MouseEventArgs e)
         {
             
+        }
+
+        private void hostButtonClick(object sender, MouseEventArgs e)
+        {
+            MainWindow main = new MainWindow();
+            main.Show();
+            this.Close();
+        }
+
+        private void joinButtonClick(object sender, MouseEventArgs e)
+        {
+            MainWindow main = new MainWindow();
+            main.Show();
+            this.Close();
+        }
+
+        private void quitButtonClick(object sender, MouseEventArgs e)
+        {
+            Close();
         }
 
     }
