@@ -47,6 +47,8 @@ namespace UNO
             menuButtons.Add(hostButton);
 
             hostButton.MouseLeftButtonDown += hostButtonClick;
+            hostButton.MouseEnter += ButtonBeginHover;
+            hostButton.MouseLeave += ButtonEndHover;
 
             //load join button
             var joinButton = Shared.LoadImage(Path.Combine(resourcesPath, "joinGame.png"), 395, 85);
@@ -56,6 +58,8 @@ namespace UNO
             menuButtons.Add(joinButton);
 
             joinButton.MouseLeftButtonDown += joinButtonClick;
+            joinButton.MouseEnter += ButtonBeginHover;
+            joinButton.MouseLeave += ButtonEndHover;
 
             //load quit button
             var quitButton = Shared.LoadImage(Path.Combine(resourcesPath, "quit.png"),166, 87);
@@ -65,7 +69,25 @@ namespace UNO
             menuButtons.Add(quitButton);
 
             quitButton.MouseLeftButtonDown += quitButtonClick;
+            quitButton.MouseEnter += ButtonBeginHover;
+            quitButton.MouseLeave += ButtonEndHover;
+        }
 
+        void ButtonEndHover(object sender, MouseEventArgs e)
+        {
+            var image = (Image)e.Source;
+            image.Width /= 1.1;
+            image.Height /= 1.1;
+        }
+
+        void ButtonBeginHover(object sender, MouseEventArgs e)
+        {
+            if (e.Source != null)
+            {
+                var image = (Image)e.Source;
+                image.Width *= 1.1;
+                image.Height *= 1.1;
+            }
         }
 
         void CanvasMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
