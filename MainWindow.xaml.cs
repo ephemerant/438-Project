@@ -19,9 +19,12 @@ namespace UNO
     {
         string resourcesPath;
         string imagesPath;
-
+        string screen = "Menu"; // The current screen being shown
         // The image (card) currently being dragged by the mouse
         Image draggedImage;
+
+        List<Image> menuButtons = new List<Image>();//the list of button images
+
         // The mouse's last position, used to prevent "jumping" during image dragging
         Point mousePosition;
 
@@ -37,6 +40,8 @@ namespace UNO
 
         void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            players.Visibility = Visibility.Hidden;
+            hand.Visibility = Visibility.Hidden;
             dealer = new Dealer();
             player = new Player();
 
@@ -57,6 +62,67 @@ namespace UNO
                 for (var i = 1; i <= 2; ++i)
                     dealer.AddToDeck(new Card(path));
             }
+
+            //load host button
+            var hostButton = Shared.LoadImage(Path.Combine(resourcesPath, "hostGame.png"), 395, 81);
+            Canvas.SetTop(hostButton, 160);
+            Canvas.SetLeft(hostButton, 200);
+            canvas.Children.Add(hostButton);
+            menuButtons.Add(hostButton);
+
+            hostButton.MouseLeftButtonUp += hostButtonClick;
+            hostButton.MouseEnter += ButtonBeginHover;
+            hostButton.MouseLeave += ButtonEndHover;
+
+            //load join button
+            var joinButton = Shared.LoadImage(Path.Combine(resourcesPath, "joinGame.png"), 395, 85);
+            Canvas.SetTop(joinButton, 250);
+            Canvas.SetLeft(joinButton, 200);
+            canvas.Children.Add(joinButton);
+            menuButtons.Add(joinButton);
+
+            joinButton.MouseLeftButtonUp += joinButtonClick;
+            joinButton.MouseEnter += ButtonBeginHover;
+            joinButton.MouseLeave += ButtonEndHover;
+
+            //load quit button
+            var quitButton = Shared.LoadImage(Path.Combine(resourcesPath, "quit.png"), 166, 87);
+            Canvas.SetTop(quitButton, 340);
+            Canvas.SetLeft(quitButton, 200);
+            canvas.Children.Add(quitButton);
+            menuButtons.Add(quitButton);
+
+            quitButton.MouseLeftButtonUp += quitButtonClick;
+            quitButton.MouseEnter += ButtonBeginHover;
+            quitButton.MouseLeave += ButtonEndHover;
+            }
+
+        private void unloadMenuScreen()
+        {
+            if (menuButtons.Count != 0)
+            {
+                for (int i = menuButtons.Count - 1; i >= 0; i--)
+                {
+                    canvas.Children.Remove(menuButtons[i]);
+                    menuButtons.RemoveAt(i);
+                }
+            }
+        }
+
+        //Open the main screen
+        private void StartMainScreen()
+        {
+            players.Visibility = Visibility.Visible;
+            hand.Visibility = Visibility.Visible;
+            string[] possibleDirectories = { @"resources", @"..\..\resources" };
+
+            foreach (var dir in possibleDirectories)
+                if (Directory.Exists(dir))
+                {
+                    resourcesPath = Path.GetFullPath(dir);
+                    imagesPath = Path.Combine(resourcesPath, "cards");
+                    break;
+                }
 
             dealer.Shuffle();
             dealer.Deal(player, 7);
@@ -117,6 +183,7 @@ namespace UNO
 
                 offset += 50;
             }
+            
         }
 
         private void ArrowEndHover(object sender, MouseEventArgs e)
@@ -167,51 +234,96 @@ namespace UNO
 
         void CanvasMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            // Was something clicked?
-            if (e.Source != null && canvas.CaptureMouse())
+            if (screen.Equals("Main"))
             {
-                // Begin drag                
-                mousePosition = e.GetPosition(canvas);
-                draggedImage = (Image)e.Source;
+                // Was something clicked?
+                if (e.Source != null && canvas.CaptureMouse())
+                {
+                    // Begin drag                
+                    mousePosition = e.GetPosition(canvas);
+                    draggedImage = (Image)e.Source;
 
-                // Make dragged image larger
-                ScaleDraggedImage(1.2);
+                    // Make dragged image larger
+                    ScaleDraggedImage(1.2);
 
-                // Redraw with updated coordinates
-                CanvasMouseMove(sender, e);
+                    // Redraw with updated coordinates
+                    CanvasMouseMove(sender, e);
+                }
             }
         }
 
         void CanvasMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (draggedImage != null)
+            if (screen.Equals("Main"))
             {
-                // End drag
-                canvas.ReleaseMouseCapture();
+                if (draggedImage != null)
+                {
+                    // End drag
+                    canvas.ReleaseMouseCapture();
 
-                // Reset dragged image's size
-                ScaleDraggedImage(1);
+                    // Reset dragged image's size
+                    ScaleDraggedImage(1);
 
-                // Redraw with updated coordinates
-                CanvasMouseMove(sender, e);
+                    // Redraw with updated coordinates
+                    CanvasMouseMove(sender, e);
 
-                draggedImage = null;
+                    draggedImage = null;
+                }
             }
         }
 
         void CanvasMouseMove(object sender, MouseEventArgs e)
         {
-            if (draggedImage != null)
+            if (screen.Equals("Main"))
             {
-                var position = e.GetPosition(canvas);
-                var offset = position - mousePosition;
+                if (draggedImage != null)
+                {
+                    var position = e.GetPosition(canvas);
+                    var offset = position - mousePosition;
 
-                mousePosition = position;
+                    mousePosition = position;
 
-                // Move the image
-                Canvas.SetLeft(draggedImage, Canvas.GetLeft(draggedImage) + offset.X);
-                Canvas.SetTop(draggedImage, Canvas.GetTop(draggedImage) + offset.Y);
+                    // Move the image
+                    Canvas.SetLeft(draggedImage, Canvas.GetLeft(draggedImage) + offset.X);
+                    Canvas.SetTop(draggedImage, Canvas.GetTop(draggedImage) + offset.Y);
+                }
             }
+        }
+
+        void ButtonEndHover(object sender, MouseEventArgs e)
+        {
+            var image = (Image)e.Source;
+            image.Width /= 1.1;
+            image.Height /= 1.1;
+        }
+
+        void ButtonBeginHover(object sender, MouseEventArgs e)
+        {
+            if (e.Source != null)
+            {
+                var image = (Image)e.Source;
+                image.Width *= 1.1;
+                image.Height *= 1.1;
+            }
+        }
+
+        private void hostButtonClick(object sender, MouseEventArgs e)
+        {
+            unloadMenuScreen();
+            StartMainScreen();
+            screen = "Main";
+        }
+
+        private void joinButtonClick(object sender, MouseEventArgs e)
+        {
+            unloadMenuScreen();
+            StartMainScreen();
+            screen = "Main";
+        }
+
+        private void quitButtonClick(object sender, MouseEventArgs e)
+        {
+            Close();
         }
 
         void BringToFront(Image image)
