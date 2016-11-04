@@ -38,6 +38,10 @@
                 </ImageBrush>
             </Canvas.Background>
         </Canvas>
+        <Canvas x:Name="table" Margin="0,0,200,158"
+                MouseLeftButtonDown="TableMouseLeftButtonDown"
+                MouseLeftButtonUp="TableMouseLeftButtonUp"
+                MouseMove="TableMouseMove"/>
         <Canvas x:Name="canvas"
                 MouseLeftButtonDown="CanvasMouseLeftButtonDown"
                 MouseLeftButtonUp="CanvasMouseLeftButtonUp"

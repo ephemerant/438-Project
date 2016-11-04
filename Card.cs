@@ -25,8 +25,8 @@ namespace UNO
 
         internal Image image;
 
-        COLOR color;
-        CARD value;
+        public COLOR color;
+        public CARD value;
 
         public Card(string path)
         {

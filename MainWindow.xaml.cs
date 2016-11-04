@@ -30,9 +30,12 @@ namespace UNO
 
         List<Image> arrows = new List<Image>();
 
+        //check images with this full deck
+        List<Card> deckToCheck = new List<Card>();
+
+
         Dealer dealer;
         Player player;
-
         public MainWindow()
         {
             InitializeComponent();
@@ -60,7 +63,11 @@ namespace UNO
             {
                 // Two of each card
                 for (var i = 1; i <= 2; ++i)
-                    dealer.AddToDeck(new Card(path));
+                {
+                    Card tempcard = new Card(path);
+                    dealer.AddToDeck(tempcard);
+                    deckToCheck.Add(tempcard);
+                }
             }
 
             //load host button
@@ -242,7 +249,7 @@ namespace UNO
                     // Begin drag                
                     mousePosition = e.GetPosition(canvas);
                     draggedImage = (Image)e.Source;
-
+                    
                     // Make dragged image larger
                     ScaleDraggedImage(1.2);
 
@@ -287,6 +294,28 @@ namespace UNO
                     Canvas.SetLeft(draggedImage, Canvas.GetLeft(draggedImage) + offset.X);
                     Canvas.SetTop(draggedImage, Canvas.GetTop(draggedImage) + offset.Y);
                 }
+            }
+        }
+
+        void TableMouseLeftButtonDown(object sender, MouseEventArgs e)
+        {
+            if (screen.Equals("Main"))
+            {
+                
+            }
+            }
+        void TableMouseLeftButtonUp(object sender, MouseEventArgs e)
+        {
+            if (screen.Equals("Main"))
+            {
+                
+            }
+        }
+        void TableMouseMove(object sender, MouseEventArgs e)
+        {
+            if (screen.Equals("Main"))
+            {
+
             }
         }
 
