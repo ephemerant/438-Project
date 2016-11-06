@@ -29,11 +29,9 @@ namespace UNO
         Point mousePosition;
 
         List<Image> arrows = new List<Image>();
-
-        //check images with this full deck
-        List<Card> deckToCheck = new List<Card>();
-
-
+        int handOffset; //where in the players 'hand' list the current displayed cards are.
+        CARD draggedCard, currentCard;//The value of the card being dragged and the card in play
+        COLOR draggedColor, currentColor;//The color of the card being dragged and the card in play
         Dealer dealer;
         Player player;
         public MainWindow()
@@ -45,8 +43,10 @@ namespace UNO
         {
             players.Visibility = Visibility.Hidden;
             hand.Visibility = Visibility.Hidden;
+            inPlay.Visibility = Visibility.Hidden;
             dealer = new Dealer();
             player = new Player();
+            handOffset = 0;
 
             // First path is for general distribution, second is for when debugging
             string[] possibleDirectories = { @"resources", @"..\..\resources" };
@@ -66,7 +66,6 @@ namespace UNO
                 {
                     Card tempcard = new Card(path);
                     dealer.AddToDeck(tempcard);
-                    deckToCheck.Add(tempcard);
                 }
             }
 
@@ -102,7 +101,7 @@ namespace UNO
             quitButton.MouseLeftButtonUp += quitButtonClick;
             quitButton.MouseEnter += ButtonBeginHover;
             quitButton.MouseLeave += ButtonEndHover;
-            }
+        }
 
         private void unloadMenuScreen()
         {
@@ -121,6 +120,7 @@ namespace UNO
         {
             players.Visibility = Visibility.Visible;
             hand.Visibility = Visibility.Visible;
+            inPlay.Visibility = Visibility.Visible;
             string[] possibleDirectories = { @"resources", @"..\..\resources" };
 
             foreach (var dir in possibleDirectories)
@@ -155,6 +155,7 @@ namespace UNO
             arrows.Add(arrow);
 
             arrow.MouseEnter += ArrowBeginHover;
+            arrow.MouseLeftButtonUp += RightArrowLeftButtonUp;
             arrow.MouseLeave += ArrowEndHover;
 
             arrow = Shared.LoadImage(Path.Combine(resourcesPath, "arrow-left.png"), 25, 45);
@@ -165,6 +166,7 @@ namespace UNO
             arrows.Add(arrow);
 
             arrow.MouseEnter += ArrowBeginHover;
+            arrow.MouseLeftButtonUp += LeftArrowLeftButtonUp;
             arrow.MouseLeave += ArrowEndHover;
 
             // Simulate players
@@ -190,7 +192,7 @@ namespace UNO
 
                 offset += 50;
             }
-            
+
         }
 
         private void ArrowEndHover(object sender, MouseEventArgs e)
@@ -249,7 +251,7 @@ namespace UNO
                     // Begin drag                
                     mousePosition = e.GetPosition(canvas);
                     draggedImage = (Image)e.Source;
-                    
+
                     // Make dragged image larger
                     ScaleDraggedImage(1.2);
 
@@ -271,6 +273,19 @@ namespace UNO
                     // Reset dragged image's size
                     ScaleDraggedImage(1);
 
+                    var point = e.GetPosition(this.canvas);
+                    if (point.X > 260 && point.X < 440 && point.Y > 120 && point.Y < 310)
+                    {
+                        int result = isValidPlay(draggedCard, draggedColor); //Check to see if card play is valid
+                        if (result == 1)//success, move to next player.
+                        {
+
+                        }
+                        else if (result == 0)//unsuccessful, move card back to hand
+                        {
+
+                        }
+                    }
                     // Redraw with updated coordinates
                     CanvasMouseMove(sender, e);
 
@@ -301,14 +316,14 @@ namespace UNO
         {
             if (screen.Equals("Main"))
             {
-                
+
             }
-            }
+        }
         void TableMouseLeftButtonUp(object sender, MouseEventArgs e)
         {
             if (screen.Equals("Main"))
             {
-                
+
             }
         }
         void TableMouseMove(object sender, MouseEventArgs e)
@@ -336,6 +351,24 @@ namespace UNO
             }
         }
 
+        void RightArrowLeftButtonUp(object sender, MouseEventArgs e)
+        {
+            dealer.Deal(player, 1);
+            if (handOffset+7 < player.hand.Count)
+            {
+                handOffset += 1;
+                reloadHand();
+            }
+        }
+
+        void LeftArrowLeftButtonUp(object sender, MouseEventArgs e)
+        {
+            if (handOffset > 0) {
+                handOffset -= 1;
+                reloadHand();
+            }
+        }
+
         private void hostButtonClick(object sender, MouseEventArgs e)
         {
             unloadMenuScreen();
@@ -353,6 +386,31 @@ namespace UNO
         private void quitButtonClick(object sender, MouseEventArgs e)
         {
             Close();
+        }
+
+        int isValidPlay(CARD cardType, COLOR cardColor)
+        {
+            
+            return 1;
+        }
+
+        void reloadHand()
+        {
+            //unload all the shown cards and reload the cards in the hand
+            canvas.Children.Clear();
+            int counter = 0;
+            int offset = 50;
+            while(counter <7)
+            {
+                Image placeCard = player.hand[handOffset + counter].image;
+                Canvas.SetTop(placeCard, 385);
+                Canvas.SetLeft(placeCard, offset);
+
+                canvas.Children.Add(placeCard);
+
+                offset += 85;
+                counter++;
+            }
         }
 
         void BringToFront(Image image)
