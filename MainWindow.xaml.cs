@@ -30,8 +30,10 @@ namespace UNO
 
         List<Image> arrows = new List<Image>();
         int handOffset; //where in the players 'hand' list the current displayed cards are.
-        CARD draggedCard, currentCard;//The value of the card being dragged and the card in play
-        COLOR draggedColor, currentColor;//The color of the card being dragged and the card in play
+        CARD draggedCard;//The value of the card being dragged
+        COLOR draggedColor;//The color of the card being dragged
+        Card currentCard;
+        int draggedOffset; //This will keep track of where a card should return to if it is to be put back in players inventory
         Dealer dealer;
         Player player;
         public MainWindow()
@@ -47,7 +49,7 @@ namespace UNO
             dealer = new Dealer();
             player = new Player();
             handOffset = 0;
-
+            draggedOffset = 0;
             // First path is for general distribution, second is for when debugging
             string[] possibleDirectories = { @"resources", @"..\..\resources" };
 
@@ -192,7 +194,10 @@ namespace UNO
 
                 offset += 50;
             }
-
+            currentCard = dealer.Deal();
+            Canvas.SetLeft(currentCard.image, 305);
+            Canvas.SetTop(currentCard.image, 140);
+            canvas.Children.Add(currentCard.image);
         }
 
         private void ArrowEndHover(object sender, MouseEventArgs e)
@@ -257,6 +262,51 @@ namespace UNO
 
                     // Redraw with updated coordinates
                     CanvasMouseMove(sender, e);
+                    if (mousePosition.Y > 369 && mousePosition.X < 645 && mousePosition.X >= 50)//if mouse if inside the 'hand' canvas
+                    {
+                        if (mousePosition.X >= 50 && mousePosition.X < 135)//if mouse is dragging card1
+                        {
+                            draggedOffset = 1;
+                            draggedCard = player.hand[handOffset].value;
+                            draggedColor = player.hand[handOffset].color;
+                        }
+                        if (mousePosition.X >= 135 && mousePosition.X < 220)//if mouse is dragging card2
+                        {
+                            draggedOffset = 2;
+                            draggedCard = player.hand[handOffset+1].value;
+                            draggedColor = player.hand[handOffset+1].color;
+                        }
+                        if (mousePosition.X >= 220 && mousePosition.X < 305)//if mouse is dragging card3
+                        {
+                            draggedOffset = 3;
+                            draggedCard = player.hand[handOffset + 2].value;
+                            draggedColor = player.hand[handOffset + 2].color;
+                        }
+                        if (mousePosition.X >= 305 && mousePosition.X < 390)//if mouse is dragging card4
+                        {
+                            draggedOffset = 4;
+                            draggedCard = player.hand[handOffset + 3].value;
+                            draggedColor = player.hand[handOffset + 3].color;
+                        }
+                        if (mousePosition.X >= 390 && mousePosition.X < 475)//if mouse is dragging card5
+                        {
+                            draggedOffset = 5;
+                            draggedCard = player.hand[handOffset + 4].value;
+                            draggedColor = player.hand[handOffset + 4].color;
+                        }
+                        if (mousePosition.X >= 475 && mousePosition.X < 560)//if mouse is dragging card6
+                        {
+                            draggedOffset = 6;
+                            draggedCard = player.hand[handOffset + 5].value;
+                            draggedColor = player.hand[handOffset + 5].color;
+                        }
+                        if (mousePosition.X >= 560 && mousePosition.X < 645)//if mouse is dragging card7
+                        {
+                            draggedOffset = 7;
+                            draggedCard = player.hand[handOffset + 6].value;
+                            draggedColor = player.hand[handOffset + 6].color;
+                        }
+                    }
                 }
             }
         }
@@ -353,7 +403,6 @@ namespace UNO
 
         void RightArrowLeftButtonUp(object sender, MouseEventArgs e)
         {
-            dealer.Deal(player, 1);
             if (handOffset+7 < player.hand.Count)
             {
                 handOffset += 1;

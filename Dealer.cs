@@ -41,5 +41,11 @@ namespace UNO
                 deck.Remove(deck.Last());
             }
         }
+        internal Card Deal()
+        {
+            Card removeCard = deck.Last();
+            deck.Remove(removeCard);
+            return removeCard;
+        }
     }
 }
