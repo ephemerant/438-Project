@@ -195,9 +195,9 @@ namespace UNO
                 offset += 50;
             }
             currentCard = dealer.Deal();
-            Canvas.SetLeft(currentCard.image, 305);
-            Canvas.SetTop(currentCard.image, 140);
-            canvas.Children.Add(currentCard.image);
+            Canvas.SetLeft(currentCard.image, 45);
+            Canvas.SetTop(currentCard.image, 20);
+            inPlay.Children.Add(currentCard.image);
         }
 
         private void ArrowEndHover(object sender, MouseEventArgs e)
@@ -250,11 +250,11 @@ namespace UNO
         {
             if (screen.Equals("Main"))
             {
+                mousePosition = e.GetPosition(canvas);
                 // Was something clicked?
-                if (e.Source != null && canvas.CaptureMouse())
+                if (mousePosition.Y > 369 && e.Source != null && canvas.CaptureMouse())
                 {
                     // Begin drag                
-                    mousePosition = e.GetPosition(canvas);
                     draggedImage = (Image)e.Source;
 
                     // Make dragged image larger
@@ -333,15 +333,26 @@ namespace UNO
                         }
                         else if (result == 0)//unsuccessful, move card back to hand
                         {
-
+                            // Redraw with updated coordinates
+                            CanvasMouseMove(sender, e);
+                            // Return to hand
+                            returnImageToHand();
                         }
                     }
-                    // Redraw with updated coordinates
-                    CanvasMouseMove(sender, e);
-
+                    else
+                    {
+                        returnImageToHand();
+                    }
+                    
                     draggedImage = null;
                 }
             }
+        }
+
+        void returnImageToHand()
+        {
+            Canvas.SetTop(draggedImage, 385);
+            Canvas.SetLeft(draggedImage, 50+((draggedOffset-1)*85));
         }
 
         void CanvasMouseMove(object sender, MouseEventArgs e)
