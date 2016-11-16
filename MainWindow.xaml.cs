@@ -19,7 +19,7 @@ namespace UNO
     {
         string resourcesPath;
         string imagesPath;
-        string screen = "Menu"; // The current screen being shown        
+        string screen; // The current screen being shown        
 
         List<Image> menuButtons = new List<Image>();//the list of button images
         List<Image> arrows = new List<Image>();
@@ -37,7 +37,6 @@ namespace UNO
         Card draggedCard; // The value of the card being dragged
         Card currentCard; // The current card in play
 
-        bool canDraw = true;//if true then player can draw from deck
         bool clickedDraw = false;//this is used to determine if player pressed down on deck
 
         Dealer dealer;
@@ -52,13 +51,15 @@ namespace UNO
 
         void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            screen = "Menu";
+
             players.Visibility = Visibility.Hidden;
             hand.Visibility = Visibility.Hidden;
             inPlay.Visibility = Visibility.Hidden;
             DrawDeck.Visibility = Visibility.Hidden;
 
             dealer = new Dealer();
-            
+
             handOffset = 0;
             draggedOffset = 0;
 
@@ -129,6 +130,16 @@ namespace UNO
             }
         }
 
+        private void unloadMainScreen()
+        {
+            canvas.Children.Clear();
+            hand.Children.Clear();
+            arrows.Clear();
+            players.Children.Clear();
+            playerList.Clear();
+            inPlay.Children.Clear();
+        }
+
         //Open the main screen
         private void StartMainScreen()
         {
@@ -147,7 +158,7 @@ namespace UNO
                 }
 
             dealer.Shuffle();
-            
+
             // Arrows
             var arrow = Shared.LoadImage(Path.Combine(resourcesPath, "arrow-right.png"), 25, 45);
             arrow.Opacity = 0.5;
@@ -325,6 +336,11 @@ namespace UNO
 
                         if (result) // The card can be played; play it and move to next player.
                         {
+                            // Add the previous card played back to the deck
+                            // TODO: It would probably be optimal to only do this after the deck runs out, so all cards will be drawn throughout a deck's life
+                            inPlay.Children.Remove(currentCard.image);
+                            dealer.AddToDeck(currentCard, true);
+
                             // Play the card
                             currentCard = draggedCard;
                             player.hand.Remove(draggedCard); // Remove it from the hand
@@ -342,6 +358,9 @@ namespace UNO
                             if (winCheck())
                             {
                                 MessageBox.Show("You win!");
+                                // Go back to the menu screen
+                                unloadMainScreen();
+                                Window_Loaded(null, null);
                             }
                             else
                                 nextPlayer(); // Move to the next player
@@ -432,18 +451,30 @@ namespace UNO
         {
             if (screen.Equals("Main"))
             {
-                if (canDraw == true)
+                if (canDraw())
                 {
                     clickedDraw = true;
                 }
             }
         }
 
+        private bool canDraw()
+        {
+            if (player != currentPlayer)
+                return false;
+
+            foreach (var card in player.hand)
+                if (isValidPlay(card))
+                    return false;
+
+            return true;
+        }
+
         void DrawDeckLeftButtonUp(object sender, MouseEventArgs e)
         {
             if (screen.Equals("Main"))
             {
-                if (canDraw == true && clickedDraw == true)
+                if (clickedDraw == true && canDraw())
                 {
                     dealer.Deal(player, 1);
                     clickedDraw = false;
@@ -461,7 +492,7 @@ namespace UNO
         {
             if (screen.Equals("Main"))
             {
-                if (canDraw == true)
+                if (canDraw())
                 {
 
                 }
@@ -543,7 +574,13 @@ namespace UNO
 
             while (counter < 7 && handOffset + counter < player.hand.Count)
             {
-                Image placeCard = player.hand[handOffset + counter].image;
+                var card = player.hand[handOffset + counter];
+                Image placeCard = card.image;
+
+                if (isValidPlay(card))
+                    card.image.Opacity = 1;
+                else
+                    card.image.Opacity = 0.5;
 
                 Canvas.SetTop(placeCard, 385);
                 Canvas.SetLeft(placeCard, offset);
@@ -553,6 +590,11 @@ namespace UNO
                 offset += 85;
                 counter++;
             }
+
+            if (canDraw())
+                DrawDeck.Opacity = 1;
+            else
+                DrawDeck.Opacity = 0.5;
 
             // Hide right arrow
             if (handOffset + 7 >= player.hand.Count)

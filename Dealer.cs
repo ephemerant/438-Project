@@ -12,9 +12,22 @@ namespace UNO
 
         List<Card> deck = new List<Card>();
 
-        internal void AddToDeck(Card card)
+        internal void AddToDeck(Card card, bool random = false)
         {
             deck.Add(card);
+
+            // Move it to a random position in the deck
+            if (random)
+            {
+                var i = deck.Count - 1;
+
+                int k = rng.Next(i + 1);
+
+                Card swapped = deck[k];
+
+                deck[k] = deck[i];
+                deck[i] = swapped;
+            }
         }
 
         internal void Shuffle()
