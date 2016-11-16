@@ -59,7 +59,7 @@
         <Canvas x:Name="DrawDeck" Margin="10,10,790,382"
                 MouseLeftButtonDown="DrawDeckLeftButtonDown"
                 MouseLeftButtonUp="DrawDeckLeftButtonUp"
-                MouseMove="DrawDeckMouseMove">
+                MouseMove="DrawDeckMouseMove" Width="75" Height="112.5">
             <Canvas.Background>
                 <ImageBrush ImageSource="draw.png" Stretch="UniformToFill"/>
             </Canvas.Background>
