@@ -24,8 +24,8 @@
                 <SolidColorBrush Color="Black" Opacity="0.5"/>
             </Canvas.Background>
         </Canvas>
-        <Canvas x:Name="inPlay" Margin="260,120,460,240">
-            <Canvas.Background>
+        <Canvas x:Name="inPlay" Margin="220,80,420,200">
+            <!--<Canvas.Background>
                 <ImageBrush ImageSource="inPlay.png" TileMode="Tile" Stretch="UniformToFill">
                     <ImageBrush.RelativeTransform>
                         <TransformGroup>
@@ -36,7 +36,7 @@
                         </TransformGroup>
                     </ImageBrush.RelativeTransform>
                 </ImageBrush>
-            </Canvas.Background>
+            </Canvas.Background>-->
         </Canvas>
         <Canvas x:Name="hand" Margin="0,369,200,0">
             <Canvas.Background>
@@ -55,7 +55,16 @@
         <Canvas x:Name="table" Margin="0,0,200,158"
                 MouseLeftButtonDown="TableMouseLeftButtonDown"
                 MouseLeftButtonUp="TableMouseLeftButtonUp"
-                MouseMove="TableMouseMove"/>
+                MouseMove="TableMouseMove"/>        
+        <Canvas x:Name="DrawDeck" Margin="100,100,700,292"
+                 MouseLeftButtonDown="DrawDeckLeftButtonDown"
+                 MouseLeftButtonUp="DrawDeckLeftButtonUp"
+                 MouseMove="DrawDeckMouseMove">            
+            <Canvas.Background>                
+                <ImageBrush ImageSource="draw.png" Stretch="UniformToFill"/>                
+            </Canvas.Background>
+            
+        </Canvas>
         <Canvas x:Name="canvas"
                 MouseLeftButtonDown="CanvasMouseLeftButtonDown"
                 MouseLeftButtonUp="CanvasMouseLeftButtonUp"

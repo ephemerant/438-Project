@@ -19,23 +19,29 @@ namespace UNO
     {
         string resourcesPath;
         string imagesPath;
-        string screen = "Menu"; // The current screen being shown
-        // The image (card) currently being dragged by the mouse
-        Image draggedImage;
+        string screen = "Menu"; // The current screen being shown        
 
         List<Image> menuButtons = new List<Image>();//the list of button images
+        List<Image> arrows = new List<Image>();
+
+        // The image (card) currently being dragged by the mouse
+        Image draggedImage;
 
         // The mouse's last position, used to prevent "jumping" during image dragging
         Point mousePosition;
 
-        List<Image> arrows = new List<Image>();
-        int handOffset; //where in the players 'hand' list the current displayed cards are.
-        CARD draggedCard;//The value of the card being dragged
-        COLOR draggedColor;//The color of the card being dragged
-        Card currentCard;
-        int draggedOffset; //This will keep track of where a card should return to if it is to be put back in players inventory
+        int handOffset; // Where in the players 'hand' list the current displayed cards are.
+        int draggedOffset; // This will keep track of where a card should return to if it is to be put back in players inventory
+
+        Card draggedCard; // The value of the card being dragged
+        Card currentCard; // The current card in play
+
         Dealer dealer;
         Player player;
+
+        bool canDraw = true;//if true then player can draw from deck
+        bool clickedDraw = false;//this is used to determine if player pressed down on deck
+
         public MainWindow()
         {
             InitializeComponent();
@@ -46,6 +52,7 @@ namespace UNO
             players.Visibility = Visibility.Hidden;
             hand.Visibility = Visibility.Hidden;
             inPlay.Visibility = Visibility.Hidden;
+            DrawDeck.Visibility = Visibility.Hidden;
             dealer = new Dealer();
             player = new Player();
             handOffset = 0;
@@ -123,6 +130,7 @@ namespace UNO
             players.Visibility = Visibility.Visible;
             hand.Visibility = Visibility.Visible;
             inPlay.Visibility = Visibility.Visible;
+            DrawDeck.Visibility = Visibility.Visible;
             string[] possibleDirectories = { @"resources", @"..\..\resources" };
 
             foreach (var dir in possibleDirectories)
@@ -194,12 +202,20 @@ namespace UNO
 
                 offset += 50;
             }
+
             currentCard = dealer.Deal();
-            Canvas.SetLeft(currentCard.image, 45);
-            Canvas.SetTop(currentCard.image, 20);
-            inPlay.Children.Add(currentCard.image);
+
+            loadCurrentCard();
 
             reloadHand();
+        }
+
+        private void loadCurrentCard()
+        {
+            Canvas.SetLeft(currentCard.image, 85); // Center within inPlay
+            Canvas.SetTop(currentCard.image, 60); // TODO: Use variable numbers instead of fixed
+
+            inPlay.Children.Add(currentCard.image);
         }
 
         private void ArrowEndHover(object sender, MouseEventArgs e)
@@ -237,7 +253,7 @@ namespace UNO
             draggedImage.Width = 100 * Card.cardScale * scale;
             draggedImage.Height = 150 * Card.cardScale * scale;
 
-            BringToFront(draggedImage);
+            BringToFront(canvas, draggedImage);
 
             // The coordinates of the image's center, post-scale
             double scaledCenterX = Canvas.GetLeft(draggedImage) + draggedImage.Width / 2;
@@ -266,47 +282,13 @@ namespace UNO
                     CanvasMouseMove(sender, e);
                     if (mousePosition.Y > 369 && mousePosition.X < 645 && mousePosition.X >= 50)//if mouse if inside the 'hand' canvas
                     {
-                        if (mousePosition.X >= 50 && mousePosition.X < 135)//if mouse is dragging card1
+                        for (int i = 0; i < 7; i++)
                         {
-                            draggedOffset = 1;
-                            draggedCard = player.hand[handOffset].value;
-                            draggedColor = player.hand[handOffset].color;
-                        }
-                        if (mousePosition.X >= 135 && mousePosition.X < 220)//if mouse is dragging card2
-                        {
-                            draggedOffset = 2;
-                            draggedCard = player.hand[handOffset + 1].value;
-                            draggedColor = player.hand[handOffset + 1].color;
-                        }
-                        if (mousePosition.X >= 220 && mousePosition.X < 305)//if mouse is dragging card3
-                        {
-                            draggedOffset = 3;
-                            draggedCard = player.hand[handOffset + 2].value;
-                            draggedColor = player.hand[handOffset + 2].color;
-                        }
-                        if (mousePosition.X >= 305 && mousePosition.X < 390)//if mouse is dragging card4
-                        {
-                            draggedOffset = 4;
-                            draggedCard = player.hand[handOffset + 3].value;
-                            draggedColor = player.hand[handOffset + 3].color;
-                        }
-                        if (mousePosition.X >= 390 && mousePosition.X < 475)//if mouse is dragging card5
-                        {
-                            draggedOffset = 5;
-                            draggedCard = player.hand[handOffset + 4].value;
-                            draggedColor = player.hand[handOffset + 4].color;
-                        }
-                        if (mousePosition.X >= 475 && mousePosition.X < 560)//if mouse is dragging card6
-                        {
-                            draggedOffset = 6;
-                            draggedCard = player.hand[handOffset + 5].value;
-                            draggedColor = player.hand[handOffset + 5].color;
-                        }
-                        if (mousePosition.X >= 560 && mousePosition.X < 645)//if mouse is dragging card7
-                        {
-                            draggedOffset = 7;
-                            draggedCard = player.hand[handOffset + 6].value;
-                            draggedColor = player.hand[handOffset + 6].color;
+                            if (mousePosition.X >= 50 + 85 * i && mousePosition.X < 135 + 85 * i) // if mouse is dragging the (i+1)th card
+                            {
+                                draggedOffset = i;
+                                draggedCard = player.hand[handOffset + draggedOffset];
+                            }
                         }
                     }
                 }
@@ -326,14 +308,35 @@ namespace UNO
                     ScaleDraggedImage(1);
 
                     var point = e.GetPosition(this.canvas);
-                    if (point.X > 260 && point.X < 440 && point.Y > 120 && point.Y < 310)
-                    {
-                        int result = isValidPlay(draggedCard, draggedColor); //Check to see if card play is valid
-                        if (result == 1)//success, move to next player.
-                        {
 
+                    if (pointWithinBounds(point))
+                    {
+                        bool result = isValidPlay(draggedCard); // Check to see if card play is valid
+
+                        if (result) // The card can be played; play it and move to next player.
+                        {
+                            // Play the card
+                            currentCard = draggedCard;
+                            player.hand.Remove(draggedCard); // Remove it from the hand
+
+                            canvas.Children.Remove(currentCard.image); // Remove it from the playable canvas
+                            loadCurrentCard(); // Add it to the played canvas
+
+                            BringToFront(inPlay, currentCard.image); // Make sure it is on top
+
+                            if (handOffset + 7 >= player.hand.Count && handOffset > 0) // Decrease the hand offset if necessary
+                                handOffset--;
+
+                            reloadHand(); // Refresh the hand
+
+                            if (winCheck())
+                            {
+                                MessageBox.Show("You win!");
+                            }
+                            else
+                                nextPlayer(); // Move to the next player
                         }
-                        else if (result == 0)//unsuccessful, move card back to hand
+                        else // Card cannot be played, move card back to hand
                         {
                             // Redraw with updated coordinates
                             CanvasMouseMove(sender, e);
@@ -351,10 +354,28 @@ namespace UNO
             }
         }
 
+        private bool pointWithinBounds(Point point)
+        {
+            double width = this.Width - inPlay.Margin.Right - inPlay.Margin.Left;
+            double height = this.Height - inPlay.Margin.Bottom - inPlay.Margin.Top;
+
+            return point.X > inPlay.Margin.Left && point.X < inPlay.Margin.Left + width && point.Y > inPlay.Margin.Top && point.Y < inPlay.Margin.Top + height;
+        }
+
+        private void nextPlayer()
+        {
+
+        }
+
+        private bool winCheck()
+        {
+            return player.hand.Count == 0;
+        }
+
         void returnImageToHand()
         {
             Canvas.SetTop(draggedImage, 385);
-            Canvas.SetLeft(draggedImage, 50 + ((draggedOffset - 1) * 85));
+            Canvas.SetLeft(draggedImage, 50 + (draggedOffset * 85));
         }
 
         void CanvasMouseMove(object sender, MouseEventArgs e)
@@ -396,6 +417,40 @@ namespace UNO
 
             }
         }
+
+        void DrawDeckLeftButtonDown(object sender, MouseEventArgs e)
+        {
+            if (screen.Equals("Main"))
+            {
+                if (canDraw == true)
+                {
+                    clickedDraw = true;
+                }
+            }
+        }
+        void DrawDeckLeftButtonUp(object sender, MouseEventArgs e)
+        {
+            if (screen.Equals("Main"))
+            {
+                if (canDraw == true && clickedDraw == true)
+                {
+                    dealer.Deal(player, 1);
+                    clickedDraw = false;
+                    reloadHand();
+                }
+            }
+        }
+        void DrawDeckMouseMove(object sender, MouseEventArgs e)
+        {
+            if (screen.Equals("Main"))
+            {
+                if (canDraw == true)
+                {
+
+                }
+            }
+        }
+
 
         void ButtonEndHover(object sender, MouseEventArgs e)
         {
@@ -451,21 +506,23 @@ namespace UNO
             Close();
         }
 
-        int isValidPlay(CARD cardType, COLOR cardColor)
+        bool isValidPlay(Card card)
         {
-
-            return 1;
+            return card.value == currentCard.value || card.color == currentCard.color || card.color == COLOR.WILD || currentCard.color == COLOR.WILD;
         }
 
         void reloadHand()
         {
             // Unload all the shown cards and reload the cards in the hand
             canvas.Children.Clear();
+
             int counter = 0;
             int offset = 50;
-            while (counter < 7)
+
+            while (counter < 7 && handOffset + counter < player.hand.Count)
             {
                 Image placeCard = player.hand[handOffset + counter].image;
+
                 Canvas.SetTop(placeCard, 385);
                 Canvas.SetLeft(placeCard, offset);
 
@@ -485,10 +542,10 @@ namespace UNO
             if (handOffset <= 0)
                 arrows[1].Visibility = Visibility.Hidden;
             else
-                arrows[1].Visibility = Visibility.Visible;            
+                arrows[1].Visibility = Visibility.Visible;
         }
 
-        void BringToFront(Image image)
+        void BringToFront(Canvas canvas, Image image)
         {
             // Move the image to the end of the children
             canvas.Children.Remove(image);

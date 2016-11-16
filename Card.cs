@@ -16,7 +16,7 @@ using System.IO;
 namespace UNO
 {
     enum COLOR { BLUE, GREEN, RED, YELLOW, WILD };
-    enum CARD { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, DRAW_2, REVERSE, SKIP, WILD };
+    enum CARD { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, DRAW_2, REVERSE, SKIP, WILD, DRAW_4 };
 
     class Card
     {
@@ -42,7 +42,11 @@ namespace UNO
             if (name == "wild" || name == "draw4")
             {
                 color = COLOR.WILD;
-                value = CARD.WILD;
+                
+                if (name == "draw4")
+                    value = CARD.DRAW_4;
+                else
+                    value = CARD.WILD;
             }
             else
             {
