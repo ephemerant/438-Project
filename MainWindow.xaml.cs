@@ -35,13 +35,13 @@ namespace UNO
 
         Card draggedCard; // The value of the card being dragged
         Card currentCard; // The current card in play
-        
+
         bool canDraw = true;//if true then player can draw from deck
         bool clickedDraw = false;//this is used to determine if player pressed down on deck
-        
+
         Dealer dealer;
         Player player;
-        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -436,6 +436,11 @@ namespace UNO
                 {
                     dealer.Deal(player, 1);
                     clickedDraw = false;
+
+                    // Scroll so we can see the last card
+                    if (player.hand.Count > 7)
+                        handOffset = player.hand.Count - 7;
+
                     reloadHand();
                 }
             }
@@ -450,7 +455,7 @@ namespace UNO
                 }
             }
         }
-        
+
         void ButtonEndHover(object sender, MouseEventArgs e)
         {
             var image = (Image)e.Source;

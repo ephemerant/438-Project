@@ -56,7 +56,7 @@
                 MouseLeftButtonDown="TableMouseLeftButtonDown"
                 MouseLeftButtonUp="TableMouseLeftButtonUp"
                 MouseMove="TableMouseMove"/>
-        <Canvas x:Name="DrawDeck" Margin="100,100,700,292"
+        <Canvas x:Name="DrawDeck" Margin="10,10,790,382"
                 MouseLeftButtonDown="DrawDeckLeftButtonDown"
                 MouseLeftButtonUp="DrawDeckLeftButtonUp"
                 MouseMove="DrawDeckMouseMove">
