@@ -23,6 +23,7 @@ namespace UNO
 
         List<Image> menuButtons = new List<Image>();//the list of button images
         List<Image> arrows = new List<Image>();
+        List<Player> playerList = new List<Player>();
 
         // The image (card) currently being dragged by the mouse
         Image draggedImage;
@@ -40,7 +41,9 @@ namespace UNO
         bool clickedDraw = false;//this is used to determine if player pressed down on deck
 
         Dealer dealer;
-        Player player;
+
+        Player player; // The actual player
+        Player currentPlayer; // The player whose turn it is
 
         public MainWindow()
         {
@@ -53,10 +56,12 @@ namespace UNO
             hand.Visibility = Visibility.Hidden;
             inPlay.Visibility = Visibility.Hidden;
             DrawDeck.Visibility = Visibility.Hidden;
+
             dealer = new Dealer();
-            player = new Player();
+            
             handOffset = 0;
             draggedOffset = 0;
+
             // First path is for general distribution, second is for when debugging
             string[] possibleDirectories = { @"resources", @"..\..\resources" };
 
@@ -70,7 +75,7 @@ namespace UNO
 
             foreach (var path in Directory.GetFiles(imagesPath))
             {
-                // Two of each card
+                // Create two of each card
                 for (var i = 1; i <= 2; ++i)
                 {
                     Card tempcard = new Card(path);
@@ -142,20 +147,7 @@ namespace UNO
                 }
 
             dealer.Shuffle();
-            dealer.Deal(player, 10);
-
-            int offset = 50;
-
-            foreach (var card in player.hand)
-            {
-                Canvas.SetTop(card.image, 385);
-                Canvas.SetLeft(card.image, offset);
-
-                canvas.Children.Add(card.image);
-
-                offset += 85;
-            }
-
+            
             // Arrows
             var arrow = Shared.LoadImage(Path.Combine(resourcesPath, "arrow-right.png"), 25, 45);
             arrow.Opacity = 0.5;
@@ -182,28 +174,46 @@ namespace UNO
             // Simulate players
             var names = new string[] { "Player 1", "Dr. Doyle", "Morpheus", "Terminator", "Citizen", "Kane", "Will Smith", "Player 8", "Iron Maiden", "Final Boss" };
 
-            offset = 0;
+            int offset = 0;
 
             var rng = new Random();
 
             foreach (var name in names)
             {
+                var player = new Player(name);
+
                 var labelName = new Label { Content = name, Foreground = Brushes.White, FontSize = 20 };
                 Canvas.SetTop(labelName, offset);
                 Canvas.SetLeft(labelName, 10);
                 players.Children.Add(labelName);
 
+                player.labelName = labelName;
+
                 int numCards = rng.Next(1, 8); // upper bound non-inclusive
 
-                var labelCards = new Label { Content = string.Format("{0} card{1}", numCards, numCards > 1 ? "s" : ""), Foreground = Brushes.White, FontSize = 14 };
+                dealer.Deal(player, numCards);
+
+                var labelCards = new Label { Foreground = Brushes.White, FontSize = 14 };
+
+                labelCards.Content = string.Format("{0} card{1}", player.hand.Count, player.hand.Count > 1 ? "s" : "");
+
                 Canvas.SetTop(labelCards, offset + 25);
                 Canvas.SetLeft(labelCards, 10);
                 players.Children.Add(labelCards);
+
+                player.labelCards = labelCards;
+
+                playerList.Add(player);
+
+                player.IsActive(false); // Dim their labels
 
                 offset += 50;
             }
 
             currentCard = dealer.Deal();
+            currentPlayer = playerList[0];
+            player = currentPlayer;
+            player.IsActive(true); // Brighten their labels
 
             loadCurrentCard();
 
@@ -555,6 +565,8 @@ namespace UNO
                 arrows[1].Visibility = Visibility.Hidden;
             else
                 arrows[1].Visibility = Visibility.Visible;
+
+            player.labelCards.Content = string.Format("{0} card{1}", player.hand.Count, player.hand.Count > 1 ? "s" : "");
         }
 
         void BringToFront(Canvas canvas, Image image)
