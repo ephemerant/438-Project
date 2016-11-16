@@ -33,6 +33,8 @@ namespace UNO
         CARD draggedCard;//The value of the card being dragged
         COLOR draggedColor;//The color of the card being dragged
         Card currentCard;
+        bool canDraw = true;//if true then player can draw from deck
+        bool clickedDraw = false;//this is used to determine if player pressed down on deck
         int draggedOffset; //This will keep track of where a card should return to if it is to be put back in players inventory
         Dealer dealer;
         Player player;
@@ -46,6 +48,7 @@ namespace UNO
             players.Visibility = Visibility.Hidden;
             hand.Visibility = Visibility.Hidden;
             inPlay.Visibility = Visibility.Hidden;
+            DrawDeck.Visibility = Visibility.Hidden;
             dealer = new Dealer();
             player = new Player();
             handOffset = 0;
@@ -123,6 +126,7 @@ namespace UNO
             players.Visibility = Visibility.Visible;
             hand.Visibility = Visibility.Visible;
             inPlay.Visibility = Visibility.Visible;
+            DrawDeck.Visibility = Visibility.Visible;
             string[] possibleDirectories = { @"resources", @"..\..\resources" };
 
             foreach (var dir in possibleDirectories)
@@ -394,6 +398,39 @@ namespace UNO
             if (screen.Equals("Main"))
             {
 
+            }
+        }
+
+        void DrawDeckLeftButtonDown(object sender, MouseEventArgs e)
+        {
+            if (screen.Equals("Main"))
+            {
+                if (canDraw == true)
+                {
+                    clickedDraw = true;
+                }
+            }
+        }
+        void DrawDeckLeftButtonUp(object sender, MouseEventArgs e)
+        {
+            if (screen.Equals("Main"))
+            {
+                if (canDraw == true && clickedDraw == true)
+                {
+                    dealer.Deal(player, 1);
+                    clickedDraw = false;
+                    reloadHand();
+                }
+            }
+        }
+        void DrawDeckMouseMove(object sender, MouseEventArgs e)
+        {
+            if (screen.Equals("Main"))
+            {
+                if (canDraw == true)
+                {
+
+                }
             }
         }
 
