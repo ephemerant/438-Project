@@ -55,15 +55,14 @@
         <Canvas x:Name="table" Margin="0,0,200,158"
                 MouseLeftButtonDown="TableMouseLeftButtonDown"
                 MouseLeftButtonUp="TableMouseLeftButtonUp"
-                MouseMove="TableMouseMove"/>        
+                MouseMove="TableMouseMove"/>
         <Canvas x:Name="DrawDeck" Margin="100,100,700,292"
-                 MouseLeftButtonDown="DrawDeckLeftButtonDown"
-                 MouseLeftButtonUp="DrawDeckLeftButtonUp"
-                 MouseMove="DrawDeckMouseMove">            
-            <Canvas.Background>                
-                <ImageBrush ImageSource="draw.png" Stretch="UniformToFill"/>                
+                MouseLeftButtonDown="DrawDeckLeftButtonDown"
+                MouseLeftButtonUp="DrawDeckLeftButtonUp"
+                MouseMove="DrawDeckMouseMove">
+            <Canvas.Background>
+                <ImageBrush ImageSource="draw.png" Stretch="UniformToFill"/>
             </Canvas.Background>
-            
         </Canvas>
         <Canvas x:Name="canvas"
                 MouseLeftButtonDown="CanvasMouseLeftButtonDown"

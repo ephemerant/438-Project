@@ -35,13 +35,13 @@ namespace UNO
 
         Card draggedCard; // The value of the card being dragged
         Card currentCard; // The current card in play
-
-        Dealer dealer;
-        Player player;
-
+        
         bool canDraw = true;//if true then player can draw from deck
         bool clickedDraw = false;//this is used to determine if player pressed down on deck
-
+        
+        Dealer dealer;
+        Player player;
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -450,8 +450,7 @@ namespace UNO
                 }
             }
         }
-
-
+        
         void ButtonEndHover(object sender, MouseEventArgs e)
         {
             var image = (Image)e.Source;
