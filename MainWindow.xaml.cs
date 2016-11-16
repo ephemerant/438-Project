@@ -428,6 +428,7 @@ namespace UNO
                 }
             }
         }
+
         void DrawDeckLeftButtonUp(object sender, MouseEventArgs e)
         {
             if (screen.Equals("Main"))
@@ -445,6 +446,7 @@ namespace UNO
                 }
             }
         }
+
         void DrawDeckMouseMove(object sender, MouseEventArgs e)
         {
             if (screen.Equals("Main"))
@@ -456,6 +458,7 @@ namespace UNO
             }
         }
 
+        // Main menu buttons
         void ButtonEndHover(object sender, MouseEventArgs e)
         {
             var image = (Image)e.Source;
@@ -463,6 +466,7 @@ namespace UNO
             image.Height /= 1.1;
         }
 
+        // Main menu buttons
         void ButtonBeginHover(object sender, MouseEventArgs e)
         {
             if (e.Source != null)
@@ -473,6 +477,7 @@ namespace UNO
             }
         }
 
+        // Scroll to the right
         void RightArrowLeftButtonUp(object sender, MouseEventArgs e)
         {
             if (handOffset + 7 < player.hand.Count)
@@ -482,6 +487,7 @@ namespace UNO
             }
         }
 
+        // Scroll to the left
         void LeftArrowLeftButtonUp(object sender, MouseEventArgs e)
         {
             if (handOffset > 0)
@@ -491,6 +497,7 @@ namespace UNO
             }
         }
 
+        // Host a game
         private void hostButtonClick(object sender, MouseEventArgs e)
         {
             unloadMenuScreen();
@@ -498,6 +505,7 @@ namespace UNO
             screen = "Main";
         }
 
+        // Join a game
         private void joinButtonClick(object sender, MouseEventArgs e)
         {
             unloadMenuScreen();

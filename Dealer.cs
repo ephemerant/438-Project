@@ -35,6 +35,9 @@ namespace UNO
         // Deal n cards to player
         internal void Deal(Player player, int n)
         {
+            if (deck.Count == 0) // TODO: Reshuffle
+                return;
+
             while (n-- > 0)
             {
                 player.AddToHand(deck.Last());
