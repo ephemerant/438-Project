@@ -134,7 +134,7 @@ namespace UNO
                 }
 
             dealer.Shuffle();
-            dealer.Deal(player, 7);
+            dealer.Deal(player, 10);
 
             int offset = 50;
 
@@ -154,7 +154,7 @@ namespace UNO
             Canvas.SetTop(arrow, 45);
             Canvas.SetRight(arrow, 10);
             hand.Children.Add(arrow);
-            arrows.Add(arrow);
+            arrows.Add(arrow); // right arrow
 
             arrow.MouseEnter += ArrowBeginHover;
             arrow.MouseLeftButtonUp += RightArrowLeftButtonUp;
@@ -165,7 +165,7 @@ namespace UNO
             Canvas.SetTop(arrow, 45);
             Canvas.SetLeft(arrow, 10);
             hand.Children.Add(arrow);
-            arrows.Add(arrow);
+            arrows.Add(arrow); // left arrow
 
             arrow.MouseEnter += ArrowBeginHover;
             arrow.MouseLeftButtonUp += LeftArrowLeftButtonUp;
@@ -198,6 +198,8 @@ namespace UNO
             Canvas.SetLeft(currentCard.image, 45);
             Canvas.SetTop(currentCard.image, 20);
             inPlay.Children.Add(currentCard.image);
+
+            reloadHand();
         }
 
         private void ArrowEndHover(object sender, MouseEventArgs e)
@@ -273,8 +275,8 @@ namespace UNO
                         if (mousePosition.X >= 135 && mousePosition.X < 220)//if mouse is dragging card2
                         {
                             draggedOffset = 2;
-                            draggedCard = player.hand[handOffset+1].value;
-                            draggedColor = player.hand[handOffset+1].color;
+                            draggedCard = player.hand[handOffset + 1].value;
+                            draggedColor = player.hand[handOffset + 1].color;
                         }
                         if (mousePosition.X >= 220 && mousePosition.X < 305)//if mouse is dragging card3
                         {
@@ -343,7 +345,7 @@ namespace UNO
                     {
                         returnImageToHand();
                     }
-                    
+
                     draggedImage = null;
                 }
             }
@@ -352,7 +354,7 @@ namespace UNO
         void returnImageToHand()
         {
             Canvas.SetTop(draggedImage, 385);
-            Canvas.SetLeft(draggedImage, 50+((draggedOffset-1)*85));
+            Canvas.SetLeft(draggedImage, 50 + ((draggedOffset - 1) * 85));
         }
 
         void CanvasMouseMove(object sender, MouseEventArgs e)
@@ -414,7 +416,7 @@ namespace UNO
 
         void RightArrowLeftButtonUp(object sender, MouseEventArgs e)
         {
-            if (handOffset+7 < player.hand.Count)
+            if (handOffset + 7 < player.hand.Count)
             {
                 handOffset += 1;
                 reloadHand();
@@ -423,7 +425,8 @@ namespace UNO
 
         void LeftArrowLeftButtonUp(object sender, MouseEventArgs e)
         {
-            if (handOffset > 0) {
+            if (handOffset > 0)
+            {
                 handOffset -= 1;
                 reloadHand();
             }
@@ -450,17 +453,17 @@ namespace UNO
 
         int isValidPlay(CARD cardType, COLOR cardColor)
         {
-            
+
             return 1;
         }
 
         void reloadHand()
         {
-            //unload all the shown cards and reload the cards in the hand
+            // Unload all the shown cards and reload the cards in the hand
             canvas.Children.Clear();
             int counter = 0;
             int offset = 50;
-            while(counter <7)
+            while (counter < 7)
             {
                 Image placeCard = player.hand[handOffset + counter].image;
                 Canvas.SetTop(placeCard, 385);
@@ -471,6 +474,18 @@ namespace UNO
                 offset += 85;
                 counter++;
             }
+
+            // Hide right arrow
+            if (handOffset + 7 >= player.hand.Count)
+                arrows[0].Visibility = Visibility.Hidden;
+            else
+                arrows[0].Visibility = Visibility.Visible;
+
+            // Hide left arrow
+            if (handOffset <= 0)
+                arrows[1].Visibility = Visibility.Hidden;
+            else
+                arrows[1].Visibility = Visibility.Visible;            
         }
 
         void BringToFront(Image image)
