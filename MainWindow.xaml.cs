@@ -43,6 +43,9 @@ namespace UNO
 
         Player player; // The actual player
         Player currentPlayer; // The player whose turn it is
+        int numberOfPlayers = 10;
+        int currentPlayerNumber = 0;//the number of the current player.
+        bool turnsReversed = false;
 
         public MainWindow()
         {
@@ -393,7 +396,26 @@ namespace UNO
 
         private void nextPlayer()
         {
-
+            if (turnsReversed == false)
+            {
+                playerList[currentPlayerNumber].IsActive(false);
+                currentPlayerNumber++;
+                if (currentPlayerNumber >= numberOfPlayers)
+                {
+                    currentPlayerNumber = 0;
+                }
+                playerList[currentPlayerNumber].IsActive(true);
+            }
+            else
+            {
+                playerList[currentPlayerNumber].IsActive(false);
+                currentPlayerNumber--;
+                if (currentPlayerNumber < 0)
+                {
+                    currentPlayerNumber = numberOfPlayers-1;
+                }
+                playerList[currentPlayerNumber].IsActive(true);
+            }
         }
 
         private bool winCheck()
