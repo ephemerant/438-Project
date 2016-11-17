@@ -30,7 +30,7 @@ namespace UNO
 
         // The mouse's last position, used to prevent "jumping" during image dragging
         Point mousePosition;
-                
+
         int draggedOffset; // This will keep track of where a card should return to if it is to be put back in players inventory
 
         Card draggedCard; // The value of the card being dragged
@@ -49,6 +49,26 @@ namespace UNO
         public MainWindow()
         {
             InitializeComponent();
+
+            Keyboard.AddKeyUpHandler(this, KeyUpHandler);
+        }
+
+        private void KeyUpHandler(object sender, KeyEventArgs e)
+        {
+            if (screen == "Main") // In-game inputs
+            {
+                switch (e.Key)
+                {
+                    case Key.D: // Scroll to the right
+                        RightArrowLeftButtonUp(null, null); break;
+                    case Key.A: // Scroll to the left
+                        LeftArrowLeftButtonUp(null, null); break;
+                    case Key.S: // Draw a card
+                        DrawDeckLeftButtonDown(null, null);
+                        DrawDeckLeftButtonUp(null, null);
+                        break;
+                }
+            }
         }
 
         void Window_Loaded(object sender, RoutedEventArgs e)
@@ -63,7 +83,7 @@ namespace UNO
             turnDirectionReverse.Visibility = Visibility.Hidden;
 
             dealer = new Dealer();
-            
+
             draggedOffset = 0;
 
             // First path is for general distribution, second is for when debugging
@@ -389,7 +409,7 @@ namespace UNO
                                 case CARD.SKIP:
                                     nextPlayer(); break;
                             }
-                            
+
                             nextPlayer(); // Move to the next player                                                        
 
                             // Handle draw 2 & draw 4
@@ -632,7 +652,7 @@ namespace UNO
 
             int counter = 0;
             int offset = 50;
-            
+
             while (counter < 7 && player.handOffset + counter < player.hand.Count)
             {
                 var card = player.hand[player.handOffset + counter];
