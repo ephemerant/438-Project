@@ -14,6 +14,7 @@ namespace UNO
         public Label labelName;
         public Label labelCards;
         public string name;
+        public int handOffset = 0; // Where in the players 'hand' list the current displayed cards are.
 
         public Player(string name)
         {
@@ -29,6 +30,8 @@ namespace UNO
         {
             labelName.Opacity = active ? 1 : 0.6;
             labelCards.Opacity = active ? 1 : 0.6;
+
+            labelCards.Content = string.Format("{0} card{1}", hand.Count, hand.Count > 1 ? "s" : "");
         }
     }
 }

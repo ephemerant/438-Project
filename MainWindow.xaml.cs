@@ -30,8 +30,7 @@ namespace UNO
 
         // The mouse's last position, used to prevent "jumping" during image dragging
         Point mousePosition;
-
-        int handOffset; // Where in the players 'hand' list the current displayed cards are.
+                
         int draggedOffset; // This will keep track of where a card should return to if it is to be put back in players inventory
 
         Card draggedCard; // The value of the card being dragged
@@ -60,10 +59,11 @@ namespace UNO
             hand.Visibility = Visibility.Hidden;
             inPlay.Visibility = Visibility.Hidden;
             DrawDeck.Visibility = Visibility.Hidden;
+            turnDirection.Visibility = Visibility.Hidden;
+            turnDirectionReverse.Visibility = Visibility.Hidden;
 
             dealer = new Dealer();
-
-            handOffset = 0;
+            
             draggedOffset = 0;
 
             // First path is for general distribution, second is for when debugging
@@ -150,6 +150,8 @@ namespace UNO
             hand.Visibility = Visibility.Visible;
             inPlay.Visibility = Visibility.Visible;
             DrawDeck.Visibility = Visibility.Visible;
+            turnDirection.Visibility = Visibility.Visible;
+
             string[] possibleDirectories = { @"resources", @"..\..\resources" };
 
             foreach (var dir in possibleDirectories)
@@ -203,9 +205,7 @@ namespace UNO
 
                 player.labelName = labelName;
 
-                int numCards = rng.Next(1, 8); // upper bound non-inclusive
-
-                dealer.Deal(player, numCards);
+                dealer.Deal(player, 7);
 
                 var labelCards = new Label { Foreground = Brushes.White, FontSize = 14 };
 
@@ -224,8 +224,13 @@ namespace UNO
                 offset += 50;
             }
 
+            turnsReversed = false;
+
             currentCard = dealer.Deal();
+
+            currentPlayerNumber = 0;
             currentPlayer = playerList[0];
+
             player = currentPlayer;
             player.IsActive(true); // Brighten their labels
 
@@ -311,7 +316,7 @@ namespace UNO
                             if (mousePosition.X >= 50 + 85 * i && mousePosition.X < 135 + 85 * i) // if mouse is dragging the (i+1)th card
                             {
                                 draggedOffset = i;
-                                draggedCard = player.hand[handOffset + draggedOffset];
+                                draggedCard = player.hand[player.handOffset + draggedOffset];
                             }
                         }
                     }
@@ -339,14 +344,6 @@ namespace UNO
 
                         if (result) // The card can be played; play it and move to next player.
                         {
-                            if (draggedCard.value == CARD.REVERSE)
-                            {
-                                turnsReversed = !turnsReversed;
-                            }
-                            if (draggedCard.value == CARD.SKIP)
-                            {
-                                nextPlayer();
-                            }
                             // Add the previous card played back to the deck
                             // TODO: It would probably be optimal to only do this after the deck runs out, so all cards will be drawn throughout a deck's life
                             inPlay.Children.Remove(currentCard.image);
@@ -361,20 +358,50 @@ namespace UNO
 
                             BringToFront(inPlay, currentCard.image); // Make sure it is on top
 
-                            if (handOffset + 7 >= player.hand.Count && handOffset > 0) // Decrease the hand offset if necessary
-                                handOffset--;
-
-                            reloadHand(); // Refresh the hand
+                            if (player.handOffset + 7 >= player.hand.Count && player.handOffset > 0) // Decrease the hand offset if necessary
+                                player.handOffset--;
 
                             if (winCheck())
                             {
-                                MessageBox.Show("You win!");
+                                MessageBox.Show(string.Format("{0} wins!", currentPlayer.name));
                                 // Go back to the menu screen
                                 unloadMainScreen();
                                 Window_Loaded(null, null);
+                                return;
                             }
-                            else
-                                nextPlayer(); // Move to the next player
+
+                            // Handle skip & reverse
+                            switch (draggedCard.value)
+                            {
+                                case CARD.REVERSE:
+                                    turnsReversed = !turnsReversed;
+                                    if (turnsReversed)
+                                    {
+                                        turnDirectionReverse.Visibility = Visibility.Visible;
+                                        turnDirection.Visibility = Visibility.Hidden;
+                                    }
+                                    else
+                                    {
+                                        turnDirection.Visibility = Visibility.Visible;
+                                        turnDirectionReverse.Visibility = Visibility.Hidden;
+                                    }
+                                    break;
+                                case CARD.SKIP:
+                                    nextPlayer(); break;
+                            }
+                            
+                            nextPlayer(); // Move to the next player                                                        
+
+                            // Handle draw 2 & draw 4
+                            switch (draggedCard.value)
+                            {
+                                case CARD.DRAW_2:
+                                    dealer.Deal(currentPlayer, 2); break;
+                                case CARD.DRAW_4:
+                                    dealer.Deal(currentPlayer, 4); break;
+                            }
+
+                            reloadHand(); // Refresh the hand
                         }
                         else // Card cannot be played, move card back to hand
                         {
@@ -406,24 +433,28 @@ namespace UNO
         {
             if (turnsReversed == false)
             {
-                playerList[currentPlayerNumber].IsActive(false);
+                currentPlayer.IsActive(false);
                 currentPlayerNumber++;
                 if (currentPlayerNumber >= numberOfPlayers)
                 {
                     currentPlayerNumber = 0;
                 }
-                playerList[currentPlayerNumber].IsActive(true);
+                currentPlayer = playerList[currentPlayerNumber];
+                currentPlayer.IsActive(true);
             }
             else
             {
-                playerList[currentPlayerNumber].IsActive(false);
+                currentPlayer.IsActive(false);
                 currentPlayerNumber--;
                 if (currentPlayerNumber < 0)
                 {
-                    currentPlayerNumber = numberOfPlayers-1;
+                    currentPlayerNumber = numberOfPlayers - 1;
                 }
-                playerList[currentPlayerNumber].IsActive(true);
+                currentPlayer = playerList[currentPlayerNumber];
+                currentPlayer.IsActive(true);
             }
+
+            player = currentPlayer; // Everyone shares
         }
 
         private bool winCheck()
@@ -511,7 +542,7 @@ namespace UNO
 
                     // Scroll so we can see the last card
                     if (player.hand.Count > 7)
-                        handOffset = player.hand.Count - 7;
+                        player.handOffset = player.hand.Count - 7;
 
                     reloadHand();
                 }
@@ -551,9 +582,9 @@ namespace UNO
         // Scroll to the right
         void RightArrowLeftButtonUp(object sender, MouseEventArgs e)
         {
-            if (handOffset + 7 < player.hand.Count)
+            if (player.handOffset + 7 < player.hand.Count)
             {
-                handOffset += 1;
+                player.handOffset += 1;
                 reloadHand();
             }
         }
@@ -561,9 +592,9 @@ namespace UNO
         // Scroll to the left
         void LeftArrowLeftButtonUp(object sender, MouseEventArgs e)
         {
-            if (handOffset > 0)
+            if (player.handOffset > 0)
             {
-                handOffset -= 1;
+                player.handOffset -= 1;
                 reloadHand();
             }
         }
@@ -601,10 +632,10 @@ namespace UNO
 
             int counter = 0;
             int offset = 50;
-
-            while (counter < 7 && handOffset + counter < player.hand.Count)
+            
+            while (counter < 7 && player.handOffset + counter < player.hand.Count)
             {
-                var card = player.hand[handOffset + counter];
+                var card = player.hand[player.handOffset + counter];
                 Image placeCard = card.image;
 
                 if (isValidPlay(card))
@@ -627,13 +658,13 @@ namespace UNO
                 DrawDeck.Opacity = 0.5;
 
             // Hide right arrow
-            if (handOffset + 7 >= player.hand.Count)
+            if (player.handOffset + 7 >= player.hand.Count)
                 arrows[0].Visibility = Visibility.Hidden;
             else
                 arrows[0].Visibility = Visibility.Visible;
 
             // Hide left arrow
-            if (handOffset <= 0)
+            if (player.handOffset <= 0)
                 arrows[1].Visibility = Visibility.Hidden;
             else
                 arrows[1].Visibility = Visibility.Visible;
