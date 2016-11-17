@@ -339,6 +339,14 @@ namespace UNO
 
                         if (result) // The card can be played; play it and move to next player.
                         {
+                            if (draggedCard.value == CARD.REVERSE)
+                            {
+                                turnsReversed = !turnsReversed;
+                            }
+                            if (draggedCard.value == CARD.SKIP)
+                            {
+                                nextPlayer();
+                            }
                             // Add the previous card played back to the deck
                             // TODO: It would probably be optimal to only do this after the deck runs out, so all cards will be drawn throughout a deck's life
                             inPlay.Children.Remove(currentCard.image);
