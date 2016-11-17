@@ -25,18 +25,6 @@
             </Canvas.Background>
         </Canvas>
         <Canvas x:Name="inPlay" Margin="220,80,420,200">
-            <!--<Canvas.Background>
-                <ImageBrush ImageSource="inPlay.png" TileMode="Tile" Stretch="UniformToFill">
-                    <ImageBrush.RelativeTransform>
-                        <TransformGroup>
-                            <ScaleTransform CenterY="0.5" CenterX="0.5" ScaleX="0.5" ScaleY="0.5"/>
-                            <SkewTransform CenterY="0.5" CenterX="0.5"/>
-                            <RotateTransform CenterY="0.5" CenterX="0.5"/>
-                            <TranslateTransform/>
-                        </TransformGroup>
-                    </ImageBrush.RelativeTransform>
-                </ImageBrush>
-            </Canvas.Background>-->
         </Canvas>
         <Canvas x:Name="hand" Margin="0,369,200,0">
             <Canvas.Background>
@@ -64,9 +52,20 @@
                 <ImageBrush ImageSource="draw.png" Stretch="UniformToFill"/>
             </Canvas.Background>
         </Canvas>
+        <Canvas x:Name="turnDirection" Width="32" Height="32" Canvas.Left="652" Canvas.Top="10" Margin="645,327,217,162">
+            <Canvas.Background>
+                <ImageBrush ImageSource="turnDirection.png" Stretch="UniformToFill"/>
+            </Canvas.Background>
+        </Canvas>
+        <Canvas x:Name="turnDirectionReverse" Width="32" Height="32" Canvas.Left="652" Canvas.Top="10" Margin="645,327,217,162">
+            <Canvas.Background>
+                <ImageBrush ImageSource="turnDirectionReverse.png" Stretch="UniformToFill"/>
+            </Canvas.Background>
+        </Canvas>
         <Canvas x:Name="canvas"
                 MouseLeftButtonDown="CanvasMouseLeftButtonDown"
                 MouseLeftButtonUp="CanvasMouseLeftButtonUp"
-                MouseMove="CanvasMouseMove"/>
+                MouseMove="CanvasMouseMove">
+        </Canvas>
     </Grid>
 </Window>
