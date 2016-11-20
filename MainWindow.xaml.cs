@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.IO;
+using System.Windows.Threading;
 
 namespace UNO
 {
@@ -45,6 +46,8 @@ namespace UNO
         int numberOfPlayers = 10;
         int currentPlayerNumber = 0;//the number of the current player.
         bool turnsReversed = false;
+
+        Action emptyDelegate = delegate () { };
 
         public MainWindow()
         {
@@ -212,11 +215,11 @@ namespace UNO
 
             int offset = 0;
 
-            var rng = new Random();
-
             foreach (var name in names)
             {
                 var player = new Player(name);
+
+                player.isComputer = true; // Test by making them all computers
 
                 var labelName = new Label { Content = name, Foreground = Brushes.White, FontSize = 20 };
                 Canvas.SetTop(labelName, offset);
@@ -228,14 +231,13 @@ namespace UNO
                 dealer.Deal(player, 7);
 
                 var labelCards = new Label { Foreground = Brushes.White, FontSize = 14 };
-
-                labelCards.Content = string.Format("{0} card{1}", player.hand.Count, player.hand.Count > 1 ? "s" : "");
-
+                
                 Canvas.SetTop(labelCards, offset + 25);
                 Canvas.SetLeft(labelCards, 10);
                 players.Children.Add(labelCards);
 
                 player.labelCards = labelCards;
+                player.UpdateLabel();
 
                 playerList.Add(player);
 
@@ -250,6 +252,7 @@ namespace UNO
 
             currentPlayerNumber = 0;
             currentPlayer = playerList[0];
+            currentPlayer.isComputer = false; // Keep us human
 
             player = currentPlayer;
             player.IsActive(true); // Brighten their labels
@@ -318,8 +321,9 @@ namespace UNO
             if (screen.Equals("Main"))
             {
                 mousePosition = e.GetPosition(canvas);
-                // Was something clicked?
-                if (mousePosition.Y > 369 && e.Source != null && canvas.CaptureMouse())
+
+                // Was a card clicked?
+                if (player == currentPlayer && mousePosition.Y > 369 && e.Source != null && canvas.CaptureMouse())
                 {
                     // Begin drag                
                     draggedImage = (Image)e.Source;
@@ -364,64 +368,7 @@ namespace UNO
 
                         if (result) // The card can be played; play it and move to next player.
                         {
-                            // Add the previous card played back to the deck
-                            // TODO: It would probably be optimal to only do this after the deck runs out, so all cards will be drawn throughout a deck's life
-                            inPlay.Children.Remove(currentCard.image);
-                            dealer.AddToDeck(currentCard, true);
-
-                            // Play the card
-                            currentCard = draggedCard;
-                            player.hand.Remove(draggedCard); // Remove it from the hand
-
-                            canvas.Children.Remove(currentCard.image); // Remove it from the playable canvas
-                            loadCurrentCard(); // Add it to the played canvas
-
-                            BringToFront(inPlay, currentCard.image); // Make sure it is on top
-
-                            if (player.handOffset + 7 >= player.hand.Count && player.handOffset > 0) // Decrease the hand offset if necessary
-                                player.handOffset--;
-
-                            if (winCheck())
-                            {
-                                MessageBox.Show(string.Format("{0} wins!", currentPlayer.name));
-                                // Go back to the menu screen
-                                unloadMainScreen();
-                                Window_Loaded(null, null);
-                                return;
-                            }
-
-                            // Handle skip & reverse
-                            switch (draggedCard.value)
-                            {
-                                case CARD.REVERSE:
-                                    turnsReversed = !turnsReversed;
-                                    if (turnsReversed)
-                                    {
-                                        turnDirectionReverse.Visibility = Visibility.Visible;
-                                        turnDirection.Visibility = Visibility.Hidden;
-                                    }
-                                    else
-                                    {
-                                        turnDirection.Visibility = Visibility.Visible;
-                                        turnDirectionReverse.Visibility = Visibility.Hidden;
-                                    }
-                                    break;
-                                case CARD.SKIP:
-                                    nextPlayer(); break;
-                            }
-
-                            nextPlayer(); // Move to the next player                                                        
-
-                            // Handle draw 2 & draw 4
-                            switch (draggedCard.value)
-                            {
-                                case CARD.DRAW_2:
-                                    dealer.Deal(currentPlayer, 2); break;
-                                case CARD.DRAW_4:
-                                    dealer.Deal(currentPlayer, 4); break;
-                            }
-
-                            reloadHand(); // Refresh the hand
+                            playCard(draggedCard);
                         }
                         else // Card cannot be played, move card back to hand
                         {
@@ -441,6 +388,102 @@ namespace UNO
             }
         }
 
+        internal void playCard(Card card)
+        {
+            // Add the previous card played back to the deck
+            // TODO: It would probably be optimal to only do this after the deck runs out, so all cards will be drawn throughout a deck's life
+            inPlay.Children.Remove(currentCard.image);
+            dealer.AddToDeck(currentCard, true);
+
+            // Play the card
+            currentCard = card;
+            currentPlayer.hand.Remove(card); // Remove it from the hand
+
+            canvas.Children.Remove(currentCard.image); // Remove it from the playable canvas
+            loadCurrentCard(); // Add it to the played canvas
+
+            BringToFront(inPlay, currentCard.image); // Make sure it is on top
+
+            if (currentPlayer.handOffset + 7 >= currentPlayer.hand.Count && currentPlayer.handOffset > 0) // Decrease the hand offset if necessary
+                currentPlayer.handOffset--;
+
+            currentPlayer.UpdateLabel();
+
+            if (winCheck())
+            {
+                MessageBox.Show(string.Format("{0} wins!", currentPlayer.name));
+                // Go back to the menu screen
+                unloadMainScreen();
+                Window_Loaded(null, null);
+                return;
+            }
+
+            // Handle skip & reverse
+            switch (card.value)
+            {
+                case CARD.REVERSE:
+                    turnsReversed = !turnsReversed;
+                    if (turnsReversed)
+                    {
+                        turnDirectionReverse.Visibility = Visibility.Visible;
+                        turnDirection.Visibility = Visibility.Hidden;
+                    }
+                    else
+                    {
+                        turnDirection.Visibility = Visibility.Visible;
+                        turnDirectionReverse.Visibility = Visibility.Hidden;
+                    }
+                    break;
+                case CARD.SKIP:
+                    nextPlayer(); break;
+            }
+
+            nextPlayer(); // Move to the next player                                                        
+
+            // Handle draw 2 & draw 4
+            switch (card.value)
+            {
+                case CARD.DRAW_2:
+                    dealer.Deal(currentPlayer, 2); break;
+                case CARD.DRAW_4:
+                    dealer.Deal(currentPlayer, 4); break;
+            }
+
+            reloadHand(); // Refresh the hand     
+
+            if (currentPlayer.isComputer)
+            {
+                currentPlayer.UpdateLabel();
+
+                while (canDraw(currentPlayer)) // Draw until the computer can make a move
+                {
+                    Console.WriteLine("Drawing...");
+
+                    Dispatcher.Invoke(DispatcherPriority.Render, emptyDelegate); // Refresh the UI
+                    System.Threading.Thread.Sleep(250);
+
+                    dealer.Deal(currentPlayer, 1);
+                    currentPlayer.UpdateLabel();
+                }
+
+                Dispatcher.Invoke(DispatcherPriority.Render, emptyDelegate); // Refresh the UI
+                System.Threading.Thread.Sleep(250);
+
+                foreach (var playableCard in currentPlayer.hand)
+                    if (isValidPlay(playableCard))
+                    {
+                        Console.WriteLine("{0} played a {1} {2}", currentPlayer.name, playableCard.color, playableCard.value);
+
+                        // Play the card
+                        playCard(playableCard);
+                        break;
+                    }
+            }
+            else
+                Console.WriteLine("Your turn!");
+        }
+
+
         private bool pointWithinBounds(Point point)
         {
             double width = this.Width - inPlay.Margin.Right - inPlay.Margin.Left;
@@ -451,35 +494,26 @@ namespace UNO
 
         private void nextPlayer()
         {
-            if (turnsReversed == false)
-            {
-                currentPlayer.IsActive(false);
-                currentPlayerNumber++;
-                if (currentPlayerNumber >= numberOfPlayers)
-                {
-                    currentPlayerNumber = 0;
-                }
-                currentPlayer = playerList[currentPlayerNumber];
-                currentPlayer.IsActive(true);
-            }
-            else
-            {
-                currentPlayer.IsActive(false);
-                currentPlayerNumber--;
-                if (currentPlayerNumber < 0)
-                {
-                    currentPlayerNumber = numberOfPlayers - 1;
-                }
-                currentPlayer = playerList[currentPlayerNumber];
-                currentPlayer.IsActive(true);
-            }
+            currentPlayer.IsActive(false);
 
-            player = currentPlayer; // Everyone shares
+            if (turnsReversed == false) // Determine the next player
+            {
+                if (++currentPlayerNumber >= numberOfPlayers)
+                    currentPlayerNumber = 0;
+            }
+            else if (--currentPlayerNumber < 0)
+                currentPlayerNumber = numberOfPlayers - 1;
+
+            currentPlayer = playerList[currentPlayerNumber];
+            currentPlayer.IsActive(true);
+
+            if (!currentPlayer.isComputer)
+                player = currentPlayer; // Shared computer
         }
 
         private bool winCheck()
         {
-            return player.hand.Count == 0;
+            return currentPlayer.hand.Count == 0;
         }
 
         void returnImageToHand()
@@ -539,8 +573,11 @@ namespace UNO
             }
         }
 
-        private bool canDraw()
+        private bool canDraw(Player player = null)
         {
+            if (player == null)
+                player = this.player;
+
             if (player != currentPlayer)
                 return false;
 
@@ -677,19 +714,22 @@ namespace UNO
             else
                 DrawDeck.Opacity = 0.5;
 
-            // Hide right arrow
-            if (player.handOffset + 7 >= player.hand.Count)
-                arrows[0].Visibility = Visibility.Hidden;
-            else
-                arrows[0].Visibility = Visibility.Visible;
+            if (arrows.Count > 0)
+            {
+                // Hide right arrow
+                if (player.handOffset + 7 >= player.hand.Count)
+                    arrows[0].Visibility = Visibility.Hidden;
+                else
+                    arrows[0].Visibility = Visibility.Visible;
 
-            // Hide left arrow
-            if (player.handOffset <= 0)
-                arrows[1].Visibility = Visibility.Hidden;
-            else
-                arrows[1].Visibility = Visibility.Visible;
+                // Hide left arrow
+                if (player.handOffset <= 0)
+                    arrows[1].Visibility = Visibility.Hidden;
+                else
+                    arrows[1].Visibility = Visibility.Visible;
+            }
 
-            player.labelCards.Content = string.Format("{0} card{1}", player.hand.Count, player.hand.Count > 1 ? "s" : "");
+            player.UpdateLabel();
         }
 
         void BringToFront(Canvas canvas, Image image)
