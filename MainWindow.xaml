@@ -44,6 +44,11 @@
                 MouseLeftButtonDown="TableMouseLeftButtonDown"
                 MouseLeftButtonUp="TableMouseLeftButtonUp"
                 MouseMove="TableMouseMove"/>
+        <Canvas x:Name="hostingPlayerList" Margin="100,70,220,160">
+            <Canvas.Background>
+                <SolidColorBrush Color="Black" Opacity="0.5"/>
+            </Canvas.Background>
+        </Canvas>
         <Canvas x:Name="DrawDeck" Margin="10,10,790,382"
                 MouseLeftButtonDown="DrawDeckLeftButtonDown"
                 MouseLeftButtonUp="DrawDeckLeftButtonUp"

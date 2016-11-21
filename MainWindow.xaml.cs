@@ -84,6 +84,7 @@ namespace UNO
             DrawDeck.Visibility = Visibility.Hidden;
             turnDirection.Visibility = Visibility.Hidden;
             turnDirectionReverse.Visibility = Visibility.Hidden;
+            hostingPlayerList.Visibility = Visibility.Hidden;
 
             dealer = new Dealer();
 
@@ -166,6 +167,127 @@ namespace UNO
             inPlay.Children.Clear();
         }
 
+        //load host screen assets
+        private void loadHostScreen()
+        {
+            hostingPlayerList.Visibility = Visibility.Visible;
+
+            //load Add Hosting Label
+            var hostingLabel = Shared.LoadImage(Path.Combine(resourcesPath, "hostingLobby.png"), 548, 112);
+            Canvas.SetTop(hostingLabel, -25);
+            Canvas.SetLeft(hostingLabel, 100);
+            canvas.Children.Add(hostingLabel);
+            menuButtons.Add(hostingLabel);
+
+            //load Add Local Player button
+            var localPlayerButton = Shared.LoadImage(Path.Combine(resourcesPath, "addLocalPlayer.png"), 224, 42);
+            Canvas.SetTop(localPlayerButton, 370);
+            Canvas.SetLeft(localPlayerButton, 100);
+            canvas.Children.Add(localPlayerButton);
+            menuButtons.Add(localPlayerButton);
+
+            localPlayerButton.MouseLeftButtonUp += localPlayerButtonClick;
+            localPlayerButton.MouseEnter += ButtonBeginHover;
+            localPlayerButton.MouseLeave += ButtonEndHover;
+
+            //load Add Computer button
+            var computerPlayerButton = Shared.LoadImage(Path.Combine(resourcesPath, "addComputer.png"), 195, 42);
+            Canvas.SetTop(computerPlayerButton, 370);
+            Canvas.SetLeft(computerPlayerButton, 450);
+            canvas.Children.Add(computerPlayerButton);
+            menuButtons.Add(computerPlayerButton);
+
+            computerPlayerButton.MouseLeftButtonUp += computerPlayerButtonClick;
+            computerPlayerButton.MouseEnter += ButtonBeginHover;
+            computerPlayerButton.MouseLeave += ButtonEndHover;
+
+            //load Add Return to menu button
+            var returnToMenuButton = Shared.LoadImage(Path.Combine(resourcesPath, "returnMenu.png"), 212, 40);
+            Canvas.SetTop(returnToMenuButton, 450);
+            Canvas.SetLeft(returnToMenuButton, 250);
+            canvas.Children.Add(returnToMenuButton);
+            menuButtons.Add(returnToMenuButton);
+
+            returnToMenuButton.MouseLeftButtonUp += hostReturnToMenuButtonClick;
+            returnToMenuButton.MouseEnter += ButtonBeginHover;
+            returnToMenuButton.MouseLeave += ButtonEndHover;
+
+            //load Add Play button
+            var playButton = Shared.LoadImage(Path.Combine(resourcesPath, "play.png"), 79, 42);
+            Canvas.SetTop(playButton, 100);
+            Canvas.SetLeft(playButton, 700);
+            canvas.Children.Add(playButton);
+            menuButtons.Add(playButton);
+
+            playButton.MouseLeftButtonUp += hostPlayButtonClick;
+            playButton.MouseEnter += ButtonBeginHover;
+            playButton.MouseLeave += ButtonEndHover;
+        }
+
+        private void unloadHostScreen()
+        {
+            hostingPlayerList.Visibility = Visibility.Hidden;
+            if (menuButtons.Count != 0)
+            {
+                for (int i = menuButtons.Count - 1; i >= 0; i--)
+                {
+                    canvas.Children.Remove(menuButtons[i]);
+                    menuButtons.RemoveAt(i);
+                }
+            }
+
+        }
+
+        //load join screen assets
+        private void loadJoinScreen()
+        {
+            hostingPlayerList.Visibility = Visibility.Visible;
+
+            //load Add Hosting Label
+            var joiningLabel = Shared.LoadImage(Path.Combine(resourcesPath, "joiningLobby.png"), 528, 112);
+            Canvas.SetTop(joiningLabel, -25);
+            Canvas.SetLeft(joiningLabel, 116);
+            canvas.Children.Add(joiningLabel);
+            menuButtons.Add(joiningLabel);
+
+            //load Add Return to menu button
+            var returnToMenuButton = Shared.LoadImage(Path.Combine(resourcesPath, "returnMenu.png"), 212, 40);
+            Canvas.SetTop(returnToMenuButton, 400);
+            Canvas.SetLeft(returnToMenuButton, 250);
+            canvas.Children.Add(returnToMenuButton);
+            menuButtons.Add(returnToMenuButton);
+
+            returnToMenuButton.MouseLeftButtonUp += joinReturnToMenuButtonClick;
+            returnToMenuButton.MouseEnter += ButtonBeginHover;
+            returnToMenuButton.MouseLeave += ButtonEndHover;
+
+
+            //load Add Play button
+            var playButton = Shared.LoadImage(Path.Combine(resourcesPath, "play.png"), 79, 42);
+            Canvas.SetTop(playButton, 100);
+            Canvas.SetLeft(playButton, 700);
+            canvas.Children.Add(playButton);
+            menuButtons.Add(playButton);
+
+            playButton.MouseLeftButtonUp += joinPlayButtonClick;
+            playButton.MouseEnter += ButtonBeginHover;
+            playButton.MouseLeave += ButtonEndHover;
+        }
+
+        private void unloadJoinScreen()
+        {
+            hostingPlayerList.Visibility = Visibility.Hidden;
+            if (menuButtons.Count != 0)
+            {
+                for (int i = menuButtons.Count - 1; i >= 0; i--)
+                {
+                    canvas.Children.Remove(menuButtons[i]);
+                    menuButtons.RemoveAt(i);
+                }
+            }
+
+        }
+
         //Open the main screen
         private void StartMainScreen()
         {
@@ -217,31 +339,31 @@ namespace UNO
 
             foreach (var name in names)
             {
-                var player = new Player(name);
+                var thisplayer = new Player(name);
 
-                player.isComputer = true; // Test by making them all computers
+                thisplayer.isComputer = true; // Test by making them all computers
 
                 var labelName = new Label { Content = name, Foreground = Brushes.White, FontSize = 20 };
                 Canvas.SetTop(labelName, offset);
                 Canvas.SetLeft(labelName, 10);
                 players.Children.Add(labelName);
 
-                player.labelName = labelName;
+                thisplayer.labelName = labelName;
 
-                dealer.Deal(player, 7);
+                dealer.Deal(thisplayer, 7);
 
                 var labelCards = new Label { Foreground = Brushes.White, FontSize = 14 };
-                
+
                 Canvas.SetTop(labelCards, offset + 25);
                 Canvas.SetLeft(labelCards, 10);
                 players.Children.Add(labelCards);
 
-                player.labelCards = labelCards;
-                player.UpdateLabel();
+                thisplayer.labelCards = labelCards;
+                thisplayer.UpdateLabel();
 
-                playerList.Add(player);
+                playerList.Add(thisplayer);
 
-                player.IsActive(false); // Dim their labels
+                thisplayer.IsActive(false); // Dim their labels
 
                 offset += 50;
             }
@@ -660,14 +782,56 @@ namespace UNO
         private void hostButtonClick(object sender, MouseEventArgs e)
         {
             unloadMenuScreen();
-            StartMainScreen();
-            screen = "Main";
+            loadHostScreen();
+            screen = "Host";
         }
 
         // Join a game
         private void joinButtonClick(object sender, MouseEventArgs e)
         {
             unloadMenuScreen();
+            loadJoinScreen();
+            screen = "Join";
+        }
+
+        //add computer player
+        private void computerPlayerButtonClick(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        //add local player
+        private void localPlayerButtonClick(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        //return to menu from host
+        private void joinReturnToMenuButtonClick(object sender, MouseEventArgs e)
+        {
+            unloadJoinScreen();
+            Window_Loaded(null, null);
+            screen = "Menu";
+        }
+
+        //return to menu from host
+        private void hostReturnToMenuButtonClick(object sender, MouseEventArgs e)
+        {
+            unloadHostScreen();
+            Window_Loaded(null, null);
+            screen = "Menu";
+        }
+
+        private void joinPlayButtonClick(object sender, MouseEventArgs e)
+        {
+            unloadJoinScreen();
+            StartMainScreen();
+            screen = "Main";
+        }
+
+        private void hostPlayButtonClick(object sender, MouseEventArgs e)
+        {
+            unloadHostScreen();
             StartMainScreen();
             screen = "Main";
         }
