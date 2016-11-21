@@ -40,10 +40,7 @@
                 </ImageBrush>
             </Canvas.Background>
         </Canvas>
-        <Canvas x:Name="table" Margin="0,0,200,158"
-                MouseLeftButtonDown="TableMouseLeftButtonDown"
-                MouseLeftButtonUp="TableMouseLeftButtonUp"
-                MouseMove="TableMouseMove"/>
+        <Canvas x:Name="table" Margin="0,0,200,158"/>
         <Canvas x:Name="hostingPlayerList" Margin="100,70,220,160">
             <Canvas.Background>
                 <SolidColorBrush Color="Black" Opacity="0.5"/>
@@ -52,7 +49,7 @@
         <Canvas x:Name="DrawDeck" Margin="10,10,790,382"
                 MouseLeftButtonDown="DrawDeckLeftButtonDown"
                 MouseLeftButtonUp="DrawDeckLeftButtonUp"
-                MouseMove="DrawDeckMouseMove" Width="75" Height="112.5">
+                Width="75" Height="112.5">
             <Canvas.Background>
                 <ImageBrush ImageSource="draw.png" Stretch="UniformToFill"/>
             </Canvas.Background>

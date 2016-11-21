@@ -8,9 +8,17 @@ namespace UNO
 {
     class Dealer
     {
+        //------------------------------
+        // Variables
+        //------------------------------
+
         static Random rng = new Random();
 
         List<Card> deck = new List<Card>();
+
+        //------------------------------
+        // Functions
+        //------------------------------
 
         internal void AddToDeck(Card card, bool random = false)
         {

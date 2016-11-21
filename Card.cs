@@ -20,6 +20,10 @@ namespace UNO
 
     class Card
     {
+        //------------------------------
+        // Variables
+        //------------------------------             
+
         // The global scale factor for all card images
         internal static double cardScale = 0.75;
 
@@ -27,6 +31,10 @@ namespace UNO
 
         public COLOR color;
         public CARD value;
+
+        //------------------------------
+        // Functions
+        //------------------------------
 
         public Card(string path)
         {
