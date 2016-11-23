@@ -35,6 +35,7 @@ namespace UNO
         public void UnloadHost()
         {
             window.hostingPlayerList.Visibility = Visibility.Hidden;
+            window.hostingPlayerList.Children.Clear();
             if (window.menuButtons.Count != 0)
             {
                 for (int i = window.menuButtons.Count - 1; i >= 0; i--)
@@ -43,12 +44,13 @@ namespace UNO
                     window.menuButtons.RemoveAt(i);
                 }
             }
-            window.playerList.Clear();
+            
         }
 
         public void UnloadClient()
         {
             window.hostingPlayerList.Visibility = Visibility.Hidden;
+            window.hostingPlayerList.Children.Clear();
             if (window.menuButtons.Count != 0)
             {
                 for (int i = window.menuButtons.Count - 1; i >= 0; i--)

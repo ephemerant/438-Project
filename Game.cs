@@ -118,17 +118,11 @@ namespace UNO
             arrow.MouseLeave += ArrowEndHover;
 
             // Simulate players
-            var names = new string[] { "Player 1", "Dr. Doyle", "Morpheus", "Terminator", "Citizen", "Kane", "Will Smith", "Player 8", "Iron Maiden", "Final Boss" };
-
             int offset = 0;
 
-            foreach (var name in names)
-            {
-                var thisplayer = new Player(name);
-
-                thisplayer.isComputer = true; // Test by making them all computers
-
-                var labelName = new Label { Content = name, Foreground = Brushes.White, FontSize = 20 };
+            foreach (Player thisplayer in window.playerList)
+            { 
+                var labelName = new Label { Content = thisplayer.name, Foreground = Brushes.White, FontSize = 20 };
                 Canvas.SetTop(labelName, offset);
                 Canvas.SetLeft(labelName, 10);
                 window.players.Children.Add(labelName);
@@ -145,8 +139,6 @@ namespace UNO
 
                 thisplayer.labelCards = labelCards;
                 thisplayer.UpdateLabel();
-
-                window.playerList.Add(thisplayer);
 
                 thisplayer.IsActive(false); // Dim their labels
 

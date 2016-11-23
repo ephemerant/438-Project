@@ -54,6 +54,7 @@ namespace UNO
         public void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // Start at the Main Menu
+            playerList.Clear();
             currentScreen = menu;
             menu.Load(this);
         }
