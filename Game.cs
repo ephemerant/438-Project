@@ -522,7 +522,7 @@ namespace UNO
                 var card = player.hand[player.handOffset + counter];
                 Image placeCard = card.image;
 
-                if (isValidPlay(card))
+                if (player == currentPlayer &&isValidPlay(card))
                     card.image.Opacity = 1;
                 else
                     card.image.Opacity = 0.5;
@@ -536,7 +536,7 @@ namespace UNO
                 counter++;
             }
 
-            if (canDraw())
+            if (player == currentPlayer && canDraw())
                 window.DrawDeck.Opacity = 1;
             else
                 window.DrawDeck.Opacity = 0.5;
