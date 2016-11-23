@@ -29,7 +29,6 @@ namespace UNO
         public List<Image> arrows = new List<Image>();
 
         public List<Player> playerList = new List<Player>();
-
         public Game game = new Game();
         public Lobby lobby = new Lobby();
         public MainMenu menu = new MainMenu();

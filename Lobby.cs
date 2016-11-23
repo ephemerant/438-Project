@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -41,6 +43,7 @@ namespace UNO
                     window.menuButtons.RemoveAt(i);
                 }
             }
+            window.playerList.Clear();
         }
 
         public void UnloadClient()
@@ -120,6 +123,22 @@ namespace UNO
             playButton.MouseLeftButtonUp += hostPlayButtonClick;
             playButton.MouseEnter += ButtonBeginHover;
             playButton.MouseLeave += ButtonEndHover;
+
+            for(int x = 0; x < 10; x++)
+            {
+                var playerNumber = new Label { Content = (x+1)+ ".", Foreground = Brushes.White, FontSize = 20 };
+                Canvas.SetTop(playerNumber, 12+ (20*x));
+                Canvas.SetLeft(playerNumber, 16);
+                window.hostingPlayerList.Children.Add(playerNumber);
+            }
+
+            window.playerList.Add(new Player("player 1"));
+            window.playerList[0].isComputer = false;
+            var labelName = new Label { Content = window.playerList[0].name, Foreground = Brushes.Orange, FontSize = 20 };
+            Canvas.SetTop(labelName, 12);
+            Canvas.SetLeft(labelName, 50);
+            window.hostingPlayerList.Children.Add(labelName);
+            window.playerList[0].labelName = labelName;
         }
 
         public void LoadClient()
@@ -160,13 +179,25 @@ namespace UNO
         //add computer player
         private void computerPlayerButtonClick(object sender, MouseEventArgs e)
         {
-
+            if (window.playerList.Count <10)
+            {
+                Player newPlayer = new Player("com");
+                newPlayer.isComputer = true;
+                window.playerList.Add(newPlayer);
+                reloadPlayerList();
+            }
         }
 
         //add local player
         private void localPlayerButtonClick(object sender, MouseEventArgs e)
         {
-
+            if(window.playerList.Count < 10)
+            {
+                Player newPlayer = new Player("player");
+                newPlayer.isComputer = false;
+                window.playerList.Add(newPlayer);
+                reloadPlayerList();
+            }
         }
 
         //return to menu from host
@@ -193,6 +224,36 @@ namespace UNO
         {
             window.unloadHostScreen();
             window.StartMainScreen();
+        }
+
+        private void reloadPlayerList()
+        {
+            window.hostingPlayerList.Children.Clear();
+            //reloading the numbers each time isn't very efficient
+            for (int x = 0; x < 10; x++)
+            {
+                var playerNumber = new Label { Content = (x + 1) + ".", Foreground = Brushes.White, FontSize = 20 };
+                Canvas.SetTop(playerNumber, 12 + (20 * x));
+                Canvas.SetLeft(playerNumber, 16);
+                window.hostingPlayerList.Children.Add(playerNumber);
+            }
+            for (int x=0; x < window.playerList.Count; x++)
+            {
+                Label thisplayer;
+                if (window.playerList[x].isComputer == false)
+                {
+                    thisplayer = new Label { Content = window.playerList[x].name, Foreground = Brushes.Orange, FontSize = 20 };
+                }
+                else
+                {
+                    thisplayer = new Label { Content = window.playerList[x].name, Foreground = Brushes.LightBlue, FontSize = 20 };
+                }
+                //Label thisplayer = new Label { Content = window.playerList[x].name, Foreground = Brushes.White, FontSize = 20 };
+                Canvas.SetTop(thisplayer, 12 + (20 * x));
+                Canvas.SetLeft(thisplayer, 50);
+                window.hostingPlayerList.Children.Add(thisplayer);
+                window.playerList[x].labelName = thisplayer;
+            }
         }
     }
 }
