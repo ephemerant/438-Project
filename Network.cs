@@ -13,7 +13,7 @@ namespace UNO
     {
 
         #regionVariables 
-
+        MainWindow window;
         //_____________________________________________________________________________________________
         //
         // Thread for client and server
@@ -52,6 +52,11 @@ namespace UNO
 
         #endregion
 
+
+        public void loadNetwork()
+        {
+            this.window = window;
+        }
         #regionClient 
 
         public void ConnectServer(string pIP)
@@ -274,7 +279,7 @@ namespace UNO
 
             try
             {
-                if (objTicTacToe.wClient == true)
+                if (window.wClient == true)
                 {
                     if (clientSockStream == null)
                         return;
@@ -342,7 +347,7 @@ namespace UNO
             // Disconnect client and server
             //_____________________________________________________________________________________________
 
-            if (objTicTacToe.wClient == true)
+            if (window.wClient == true)
             {
                 thread_receive_client.Abort();
 
@@ -356,7 +361,7 @@ namespace UNO
 
             }
 
-            if (objTicTacToe.wServer == true)
+            if (window.wServer == true)
             {
                 thread_receive_server.Abort();
 

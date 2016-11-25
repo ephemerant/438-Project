@@ -33,6 +33,10 @@ namespace UNO
         public Lobby lobby = new Lobby();
         public MainMenu menu = new MainMenu();
 
+        //copied from tictactoe
+        public bool wServer = false;
+        public bool wClient = false;
+
         Screen currentScreen;
 
         //------------------------------

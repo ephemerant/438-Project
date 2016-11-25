@@ -44,6 +44,8 @@ namespace UNO
         int currentPlayerNumber = 0;//the number of the current player.
         bool turnsReversed = false;
 
+        
+
         MainWindow window;
 
         //------------------------------
