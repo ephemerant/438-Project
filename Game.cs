@@ -11,6 +11,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using System.Net;
+using System.Net.Sockets;
 using System.IO;
 using System.Windows.Threading;
 
