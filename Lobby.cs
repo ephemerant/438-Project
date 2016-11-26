@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Net;
@@ -23,6 +24,7 @@ namespace UNO
         MainWindow window;
         String clientName;
         int comcount;
+        Thread thread;
 
         //------------------------------
         // Functions
@@ -146,7 +148,9 @@ namespace UNO
             Canvas.SetLeft(labelName, 50);
             window.hostingPlayerList.Children.Add(labelName);
             window.playerList[0].labelName = labelName;
-            
+
+            thread = new Thread(new ThreadStart(window.udpconnect.ReceiveMessage));
+            thread.Start();
         }
 
         public void LoadClient()
@@ -171,17 +175,16 @@ namespace UNO
             returnToMenuButton.MouseEnter += ButtonBeginHover;
             returnToMenuButton.MouseLeave += ButtonEndHover;
 
+            //load Connect to IP
+            var connectIP = Shared.LoadImage(Path.Combine(window.resourcesPath, "connectIP.png"), 198, 58);
+            Canvas.SetTop(connectIP, 400);
+            Canvas.SetLeft(connectIP, 520);
+            window.canvas.Children.Add(connectIP);
+            window.menuButtons.Add(connectIP);
 
-            //load Add Play button
-            var playButton = Shared.LoadImage(Path.Combine(window.resourcesPath, "play.png"), 79, 42);
-            Canvas.SetTop(playButton, 100);
-            Canvas.SetLeft(playButton, 700);
-            window.canvas.Children.Add(playButton);
-            window.menuButtons.Add(playButton);
-
-            playButton.MouseLeftButtonUp += joinPlayButtonClick;
-            playButton.MouseEnter += ButtonBeginHover;
-            playButton.MouseLeave += ButtonEndHover;
+            connectIP.MouseLeftButtonUp += connectIPButtonClick;
+            connectIP.MouseEnter += ButtonBeginHover;
+            connectIP.MouseLeave += ButtonEndHover;
             clientName = window.udpconnect.getName();
         }
 
@@ -235,6 +238,13 @@ namespace UNO
         {
             window.unloadHostScreen();
             window.StartMainScreen();
+        }
+
+        private void connectIPButtonClick(object sender, MouseEventArgs e)
+        {
+            String inputIP = window.udpconnect.getIP();
+            
+            window.udpconnect.SendMessage("a",inputIP);
         }
 
         private void reloadPlayerList()

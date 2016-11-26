@@ -15,8 +15,6 @@ namespace UNO
     {
         public string name = "";
 
-        Thread thread;
-
         UdpClient udpResponse = new UdpClient(42424, AddressFamily.InterNetwork);
 
         public String getName()
@@ -27,7 +25,15 @@ namespace UNO
             return name;
         }
 
-        private void SendMessage(string message)
+        public String getIP()
+        {
+            String IP = "";
+            while (IP.Length == 0)
+                IP = Interaction.InputBox("What is the IP?").Trim();
+            return IP;
+        }
+
+        public void SendMessage(string message)
         {
             // send via UDP
             UdpClient client = new UdpClient(24242, AddressFamily.InterNetwork);
@@ -42,7 +48,23 @@ namespace UNO
             client.Close();
         }
 
-        private void ReceiveMessage()
+        //alternative sendMessage with IP address
+        public void SendMessage(string message, string inputIP)
+        {
+            // send via UDP
+            UdpClient client = new UdpClient(24242, AddressFamily.InterNetwork);
+            client.EnableBroadcast = true;
+
+            IPEndPoint groupEp = new IPEndPoint(IPAddress.Parse(inputIP), 42424);
+            client.Connect(groupEp);
+
+            var data = Encoding.ASCII.GetBytes(message);
+
+            client.Send(data, data.Length);
+            client.Close();
+        }
+
+        public void ReceiveMessage()
         {
             try
             {
@@ -62,6 +84,11 @@ namespace UNO
                 if (ex.Message != "A blocking operation was interrupted by a call to WSACancelBlockingCall")
                     throw ex;
             }
+        }
+
+        private void EndReceive(object sender, CancelEventArgs e)
+        {
+            udpResponse.Close();
         }
 
     }
