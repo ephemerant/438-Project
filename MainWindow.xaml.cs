@@ -33,6 +33,7 @@ namespace UNO
         public Lobby lobby = new Lobby();
         public MainMenu menu = new MainMenu();
         public Network network = new Network();
+        public UDP udpconnect = new UDP();
 
         //copied from tictactoe
         public bool wServer = false;

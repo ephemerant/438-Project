@@ -21,6 +21,8 @@ namespace UNO
         //------------------------------
 
         MainWindow window;
+        String clientName;
+        int comcount;
 
         //------------------------------
         // Functions
@@ -66,6 +68,7 @@ namespace UNO
         public void Load(MainWindow window, bool isHost)
         {
             this.window = window;
+            comcount = 0;
 
             if (isHost)
                 LoadHost();
@@ -135,14 +138,15 @@ namespace UNO
                 Canvas.SetLeft(playerNumber, 16);
                 window.hostingPlayerList.Children.Add(playerNumber);
             }
-
-            window.playerList.Add(new Player("player 1"));
+            String inputname = window.udpconnect.getName();
+            window.playerList.Add(new Player(inputname));
             window.playerList[0].isComputer = false;
             var labelName = new Label { Content = window.playerList[0].name, Foreground = Brushes.Orange, FontSize = 20 };
             Canvas.SetTop(labelName, 12);
             Canvas.SetLeft(labelName, 50);
             window.hostingPlayerList.Children.Add(labelName);
             window.playerList[0].labelName = labelName;
+            
         }
 
         public void LoadClient()
@@ -178,6 +182,7 @@ namespace UNO
             playButton.MouseLeftButtonUp += joinPlayButtonClick;
             playButton.MouseEnter += ButtonBeginHover;
             playButton.MouseLeave += ButtonEndHover;
+            clientName = window.udpconnect.getName();
         }
 
         //add computer player
@@ -185,7 +190,8 @@ namespace UNO
         {
             if (window.playerList.Count <10)
             {
-                Player newPlayer = new Player("com");
+                Player newPlayer = new Player("com"+ (comcount+1));
+                comcount++;
                 newPlayer.isComputer = true;
                 window.playerList.Add(newPlayer);
                 reloadPlayerList();
@@ -197,7 +203,8 @@ namespace UNO
         {
             if(window.playerList.Count < 10)
             {
-                Player newPlayer = new Player("player");
+                String inputname = window.udpconnect.getName();
+                Player newPlayer = new Player(inputname);
                 newPlayer.isComputer = false;
                 window.playerList.Add(newPlayer);
                 reloadPlayerList();
