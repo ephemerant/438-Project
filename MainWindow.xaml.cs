@@ -32,6 +32,7 @@ namespace UNO
         public Game game = new Game();
         public Lobby lobby = new Lobby();
         public MainMenu menu = new MainMenu();
+        public Network network = new Network();
 
         //copied from tictactoe
         public bool wServer = false;

@@ -15,8 +15,8 @@ using System.IO;
 
 namespace UNO
 {
-    enum COLOR { BLUE, GREEN, RED, YELLOW, WILD };
-    enum CARD { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, DRAW_2, REVERSE, SKIP, WILD, DRAW_4 };
+    public enum COLOR { BLUE, GREEN, RED, YELLOW, WILD };
+    public enum CARD { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, DRAW_2, REVERSE, SKIP, WILD, DRAW_4 };
 
     class Card
     {

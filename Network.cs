@@ -52,11 +52,6 @@ namespace UNO
 
         #endregion
 
-
-        public void loadNetwork()
-        {
-            this.window = window;
-        }
         #regionClient 
 
         public void ConnectServer(string pIP)
@@ -183,7 +178,7 @@ namespace UNO
             try
             {
                 byte[] buf = new byte[512];
-                IPHostEntry localHostEntry = Dns.GetHostByName(Dns.GetHostName());
+                IPHostEntry localHostEntry = Dns.GetHostEntry(Dns.GetHostName());
                 int bytesReceived = 0;
 
                 tcpListener = new TcpListener(localHostEntry.AddressList[0], SERVERPORT);
@@ -310,31 +305,17 @@ namespace UNO
 
         }
 
-        public void SendMove(int wRow, int wColumn)
+        public void SendMove(CARD mycard, COLOR mycolor, int cardcount)
         {
-            //_____________________________________________________________________________________________
-            //
-            // Sends packet that shows move position
-            //_____________________________________________________________________________________________
+            //send packet
+            //0 = card type
+            //1 = card color
+            //2 = card count
 
-            byte[] buf = new byte[2];
-            buf[0] = byte.Parse(Asc(wRow.ToString()).ToString());
-            buf[1] = byte.Parse(Asc(wColumn.ToString()).ToString());
-
-            SendPacketTCP(buf);
-
-        }
-
-        public void SendsRestartPacket()
-        {
-            //_____________________________________________________________________________________________
-            //
-            // Sends packet for the other game restart
-            //_____________________________________________________________________________________________
-
-            byte[] buf = new byte[2];
-            buf[0] = byte.Parse(Asc("R").ToString());
-            buf[1] = 0;
+            byte[] buf = new byte[3];
+            buf[0] = byte.Parse(mycard.ToString());
+            buf[1] = byte.Parse(mycolor.ToString());
+            buf[2] = byte.Parse(cardcount.ToString());
 
             SendPacketTCP(buf);
 

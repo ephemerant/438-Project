@@ -39,7 +39,7 @@ namespace UNO
 
         Dealer dealer;
 
-        Player player; // The actual player
+        public Player player; // The actual player
         Player currentPlayer; // The player whose turn it is
         int currentPlayerNumber = 0;//the number of the current player.
         bool turnsReversed = false;
@@ -65,6 +65,7 @@ namespace UNO
         public void Load(MainWindow window)
         {
             this.window = window;
+            
 
             dealer = new Dealer();
 
@@ -574,6 +575,12 @@ namespace UNO
             // Set Z-index based on position in Children
             foreach (UIElement c in canvas.Children)
                 Panel.SetZIndex(c, i++);
+        }
+
+        bool sendTurnInfo()
+        {
+            window.network.SendMove(currentCard.value, currentCard.color, player.hand.Count);
+            return true;// this will return whether the send was successful, for now just default to true
         }
     }
 }
