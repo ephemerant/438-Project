@@ -74,9 +74,9 @@ namespace UNO
                 while (true)
                 {
                     IPEndPoint recvEp = new IPEndPoint(IPAddress.Any, 0);
-                    
+
                     var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
-                    
+
                     var message = new Message(text);
 
                 }
@@ -102,7 +102,7 @@ namespace UNO
 
                 foreach (var player in window.playerList)
                 {
-                    players.Add(new Player { name = player.name, IP=player.IP, isComputer=player.isComputer });
+                    players.Add(new Player { name = player.name, IP = player.IP, isComputer = player.isComputer });
                 }
 
                 SendMessage(new Message { HostID = window.HostID, Action = "hosting", PlayerName = window.lobby.clientName, PlayerList = players });
@@ -122,6 +122,14 @@ namespace UNO
 
                     var message = new Message(text);
 
+                    if (message.HostID == window.HostID && message.Action == "join")
+                    {
+                        SendMessage(new Message { HostID = window.HostID, Action = "joinAck", PlayerID = message.PlayerID, PlayerName = message.PlayerName });
+                    }
+                    if (message.HostID == window.HostID && message.Action == "joinAckAck")
+                    {
+                        window.lobby.addClient(message);
+                    }
                 }
             }
             catch (Exception ex)
@@ -141,7 +149,7 @@ namespace UNO
                     IPEndPoint recvEp = new IPEndPoint(IPAddress.Any, 0);
 
                     var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
-                    
+
                     var message = new Message(text);
                     Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
                     {
@@ -149,6 +157,10 @@ namespace UNO
                         {
                             window.lobby.hosts.Add(message.HostID, message.PlayerName);
                             window.lobby.reloadHostList();
+                        }
+                        if (message.Action.Equals("joinAck") && window.lobby.hosts.ContainsKey(message.HostID) && message.PlayerID == window.HostID)
+                        {
+                            SendMessage(new Message { HostID = window.HostID, Action = "joinAckAck", PlayerName = window.lobby.clientName });
                         }
 
                     }));
