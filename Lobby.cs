@@ -24,6 +24,8 @@ namespace UNO
         public String clientName;
         MainWindow window;
         int comcount;
+        public Dictionary<string, string> hosts = new Dictionary<string, string>();
+
 
         //------------------------------
         // Functions
@@ -310,6 +312,30 @@ namespace UNO
                 }
                 window.hostingPlayerList.Children.Add(thisplayer);
                 window.playerList[x].labelName = thisplayer;
+            }
+        }
+
+        public void hostingLabelClick(object sender, MouseEventArgs e)
+        {
+            if (e.Source != null)
+            {
+                var label = (Label)e.Source;
+                window.udpConnect.SendMessage(new Message { HostID =(String)label.Tag, Action = "join", PlayerID = window.HostID, PlayerName = clientName });
+            }
+        }
+
+        public void reloadHostList()
+        {
+            for(int x =0; x < hosts.Count; x++)
+            {
+                var playerNumber = new Label { Content = hosts.ElementAt(x).Value, Foreground = Brushes.White, FontSize = 20 };
+                Canvas.SetTop(playerNumber, 12 + (20 * x));
+                Canvas.SetLeft(playerNumber, 16);
+                playerNumber.Tag = hosts.ElementAt(x).Key;
+                window.hostingPlayerList.Children.Add(playerNumber);
+                playerNumber.MouseLeftButtonUp += hostingLabelClick;
+                //playerNumber.MouseEnter += ButtonBeginHover;
+                //playerNumber.MouseLeave += ButtonEndHover;
             }
         }
     }

@@ -8,6 +8,7 @@ using System.Net;
 using System.Threading;
 using System.ComponentModel;
 using Newtonsoft.Json;
+using System.Windows.Threading;
 
 namespace UNO
 {
@@ -111,7 +112,8 @@ namespace UNO
 
                     var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
 
-                    var message = new Message(text);                    
+                    var message = new Message(text);
+                                    
                 }
             }
             catch (Exception ex)
@@ -133,6 +135,16 @@ namespace UNO
                     var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
 
                     var message = new Message(text);
+                    Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
+                    {
+                        if (message.Action.Equals("hosting") && !window.lobby.hosts.ContainsKey(message.HostID))
+                        {
+                            window.lobby.hosts.Add(message.HostID, message.PlayerName);
+                            window.lobby.reloadHostList();
+                        }
+
+                    }));
+
                 }
             }
             catch (Exception ex)
