@@ -57,6 +57,8 @@ namespace UNO
 
         public void UnloadClient()
         {
+            hosts.Clear();
+
             window.hostingPlayerList.Visibility = Visibility.Hidden;
             window.hostingPlayerList.Children.Clear();
             if (window.menuButtons.Count != 0)
@@ -201,13 +203,9 @@ namespace UNO
             }
             
             reloadPlayerList(false);
-
-            // broadcast that we're hosting
-            var threadBroadcast = new Thread(new ThreadStart(window.udpConnect.BroadcastHost));
-            threadBroadcast.Start();
-
-            // listen for clients wanting to join
-            var threadListen = new Thread(new ThreadStart(window.udpConnect.ListenForClients));
+            
+            // listen for updates from the host
+            var threadListen = new Thread(new ThreadStart(window.udpConnect.ListenForPlayerList));
             threadListen.Start();
         }
 

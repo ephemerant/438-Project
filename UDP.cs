@@ -130,7 +130,7 @@ namespace UNO
 
                     if (message.HostID == window.UserID && message.Action == "join")
                     {
-                        SendMessage(new Message { HostID = window.UserID, Action = "joinAck", PlayerID = message.PlayerID, PlayerName = message.PlayerName });
+                        SendMessage(new Message { HostID = window.UserID, Action = "joinAck", PlayerID = message.PlayerID, PlayerName = message.PlayerName, PlayerList = window.playerList });
                     }
                     if (message.HostID == window.UserID && message.Action == "joinAckAck")
                     {
@@ -176,6 +176,7 @@ namespace UNO
                             SendMessage(new Message { HostID = message.HostID, PlayerID = window.UserID, Action = "joinAckAck", PlayerName = window.lobby.clientName, Extra = recvEp.Address.ToString() });
                             window.lobby.UnloadClient();
                             window.lobby.HostID = message.HostID;
+                            window.playerList = message.PlayerList;
                             window.lobby.LoadWaiting();
                         }));
                         return;
