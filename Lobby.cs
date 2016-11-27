@@ -334,6 +334,7 @@ namespace UNO
             client.isComputer = false;
             client.IP = message.Extra;
             window.playerList.Add(client);
+            reloadPlayerList();
         }
 
         public void reloadHostList()
