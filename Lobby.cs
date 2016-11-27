@@ -151,6 +151,7 @@ namespace UNO
 
             window.playerList.Add(new Player(clientName));
             window.playerList[0].isComputer = false;
+            window.playerList[0].ID = window.UserID;
 
             var labelName = new Label { Content = window.playerList[0].name, Foreground = Brushes.Orange, FontSize = 20 };
 
@@ -253,9 +254,10 @@ namespace UNO
         {
             if (window.playerList.Count < 10)
             {
-                Player newPlayer = new Player("com" + (comcount + 1));
-                comcount++;
+                Player newPlayer = new Player("Computer " + (++comcount));
                 newPlayer.isComputer = true;
+                newPlayer.ID = window.UserID;
+
                 window.playerList.Add(newPlayer);
                 reloadPlayerList(true);
             }
@@ -266,9 +268,10 @@ namespace UNO
         {
             if (window.playerList.Count < 10)
             {
-                String inputname = window.udpConnect.getName();
-                Player newPlayer = new Player(inputname);
+                Player newPlayer = new Player(window.udpConnect.getName());
                 newPlayer.isComputer = false;
+                newPlayer.ID = window.UserID;
+
                 window.playerList.Add(newPlayer);
                 reloadPlayerList(true);
             }
@@ -296,9 +299,9 @@ namespace UNO
 
         private void connectIPButtonClick(object sender, MouseEventArgs e)
         {
-            String inputIP = window.udpConnect.getIP();
+            //String inputIP = window.udpConnect.getIP();
 
-            window.udpConnect.SendMessage("a", inputIP);
+            //window.udpConnect.SendMessage("a", inputIP);
         }
 
         private void deleteButtonClick(object sender, MouseEventArgs e)
@@ -371,6 +374,7 @@ namespace UNO
             Player client = new Player(message.PlayerName);
             client.isComputer = false;
             client.IP = message.Extra;
+            client.ID = message.PlayerID;
             window.playerList.Add(client);
             reloadPlayerList(true);
         }

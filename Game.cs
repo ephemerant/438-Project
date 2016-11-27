@@ -119,6 +119,8 @@ namespace UNO
                 }
             }
 
+            window.playerList = message.PlayerList;
+
             // Load players
             int offset = 0;
 
@@ -159,7 +161,8 @@ namespace UNO
             loadCurrentCard();
 
             // TODO: Determine which player we are
-            // player = me;
+            player = Shared.GetPlayer(window.UserID, window.playerList);
+
             //reloadHand();
         }
 

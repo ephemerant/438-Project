@@ -23,7 +23,9 @@ namespace UNO
 
         public int handOffset = 0; // Where in the players 'hand' list the current displayed cards are.
 
-        public bool isComputer = false;        
+        public bool isComputer = false;
+
+        public string ID;
 
         public string IP;
 

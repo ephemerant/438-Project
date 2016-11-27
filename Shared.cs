@@ -12,7 +12,7 @@ namespace UNO
     public static class Shared
     {
         public static Image LoadImage(string path, double w, double h)
-        {           
+        {
             // load the image
             BitmapImage src = new BitmapImage();
             src.BeginInit();
@@ -43,7 +43,7 @@ namespace UNO
             var players = new List<Player>();
 
             foreach (var player in playerList)
-                players.Add(new Player { name = player.name, IP = player.IP, isComputer = player.isComputer, hand = Strip(player.hand) });
+                players.Add(new Player { name = player.name, IP = player.IP, ID = player.ID, isComputer = player.isComputer, hand = Strip(player.hand) });
 
             return players;
         }
@@ -62,6 +62,15 @@ namespace UNO
                 cards.Add(Unstrip(card, clientCards));
 
             return cards;
+        }
+
+        public static Player GetPlayer(string userID, List<Player> playerList)
+        {
+            foreach (var player in playerList)
+                if (player.ID == userID)
+                    return player;
+
+            throw new Exception("userID not in playerList");
         }
     }
 }
