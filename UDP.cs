@@ -128,7 +128,10 @@ namespace UNO
                     }
                     if (message.HostID == window.HostID && message.Action == "joinAckAck")
                     {
-                        window.lobby.addClient(message);
+                        Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
+                        {
+                            window.lobby.addClient(message);
+                        }));
                     }
                 }
             }
