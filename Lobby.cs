@@ -291,7 +291,7 @@ namespace UNO
         private void hostPlayButtonClick(object sender, MouseEventArgs e)
         {           
             window.unloadHostScreen();
-            window.StartMainScreen();
+            window.StartGame();
         }
 
         private void connectIPButtonClick(object sender, MouseEventArgs e)

@@ -208,9 +208,10 @@ namespace UNO
                             }));
                         else if (message.Action == "begin")
                             Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
-                            {
+                            {                               
                                 window.lobby.UnloadHost();
-                                window.StartMainScreen();
+                                
+                                window.StartGame(message);
                             }));
                     }
                 }

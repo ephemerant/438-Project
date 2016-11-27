@@ -53,6 +53,16 @@ namespace UNO
         {
             InitializeComponent();
 
+            string[] possibleDirectories = { @"resources", @"..\..\resources" };
+
+            foreach (var dir in possibleDirectories)
+                if (Directory.Exists(dir))
+                {
+                    resourcesPath = Path.GetFullPath(dir);
+                    imagesPath = Path.Combine(resourcesPath, "cards");
+                    break;
+                }
+
             udpConnect = new UDP { window = this };
 
             UserID = DateTime.Now.Ticks.ToString();
@@ -115,10 +125,10 @@ namespace UNO
         }
 
         //Open the main screen
-        public void StartMainScreen()
+        public void StartGame(Message message = null)
         {
             currentScreen = game;
-            game.Load(this);
+            game.Load(this, message);
         }
 
         public void DrawDeckLeftButtonDown(object sender, MouseEventArgs e)
