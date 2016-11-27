@@ -227,6 +227,7 @@ namespace UNO
             PlayerName = message.PlayerName;
             PlayerList = message.PlayerList;
             Card = message.Card;
+            Extra = message.Extra;
         }
 
         public override string ToString()
