@@ -9,6 +9,7 @@ using System.Threading;
 using System.ComponentModel;
 using Newtonsoft.Json;
 using System.Windows.Threading;
+using System.Collections.Generic;
 
 namespace UNO
 {
@@ -73,9 +74,9 @@ namespace UNO
                 while (true)
                 {
                     IPEndPoint recvEp = new IPEndPoint(IPAddress.Any, 0);
-
+                    
                     var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
-
+                    
                     var message = new Message(text);
 
                 }
@@ -97,7 +98,14 @@ namespace UNO
         {
             while (window.currentScreen == window.lobby)
             {
-                SendMessage(new Message { HostID = window.HostID, Action = "hosting", PlayerName=window.lobby.clientName });
+                var players = new List<Player>();
+
+                foreach (var player in window.playerList)
+                {
+                    players.Add(new Player { name = player.name, IP=player.IP, isComputer=player.isComputer });
+                }
+
+                SendMessage(new Message { HostID = window.HostID, Action = "hosting", PlayerName = window.lobby.clientName, PlayerList = players });
                 Thread.Sleep(5000);
             }
         }
@@ -113,7 +121,7 @@ namespace UNO
                     var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
 
                     var message = new Message(text);
-                                    
+
                 }
             }
             catch (Exception ex)
@@ -133,7 +141,7 @@ namespace UNO
                     IPEndPoint recvEp = new IPEndPoint(IPAddress.Any, 0);
 
                     var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
-
+                    
                     var message = new Message(text);
                     Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
                     {
@@ -184,6 +192,7 @@ namespace UNO
         public string Action { get; set; }
         public string Extra { get; set; }
         public string PlayerName { get; set; }
+        public List<Player> PlayerList { get; set; }
         public Card Card { get; set; }
 
         public Message()
@@ -201,6 +210,7 @@ namespace UNO
             PlayerID = message.PlayerID;
             Action = message.Action;
             PlayerName = message.PlayerName;
+            PlayerList = message.PlayerList;
             Card = message.Card;
         }
 

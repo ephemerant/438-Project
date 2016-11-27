@@ -13,7 +13,7 @@ namespace UNO
         // Variables
         //------------------------------
 
-        internal List<Card> hand = new List<Card>();
+        internal List<Card> hand;
 
         public Label labelName;
         public Label labelCards;
@@ -24,13 +24,22 @@ namespace UNO
 
         public bool isComputer = false;
 
+        public string IP;
+
         //------------------------------
         // Functions
         //------------------------------
 
+        public Player()
+        {
+
+        }
+
         public Player(string name)
         {
             this.name = name;
+
+            hand = new List<Card>();
         }
 
         internal void AddToHand(Card card)
