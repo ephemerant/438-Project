@@ -51,6 +51,7 @@ namespace UNO
         List<Card> cardsByID;
 
         int turnCount;
+        int seed;
 
         //------------------------------
         // Functions
@@ -104,6 +105,8 @@ namespace UNO
 
             dealer = new Dealer();
 
+            cardsByID = new List<Card>();
+
             foreach (var path in Directory.GetFiles(window.imagesPath))
             {
                 // Create two of each card and store them
@@ -114,6 +117,30 @@ namespace UNO
                     cardsByID.Add(tempcard);
                 }
             }
+
+            foreach (var path in Directory.GetFiles(window.imagesPath))
+            {
+                // Create two of each card and add them to the deck
+                for (var i = 1; i <= 2; ++i)
+                {
+                    Card tempcard = new Card(path);
+                    dealer.AddToDeck(tempcard);
+                }
+            }
+
+            if (message == null)
+            {
+                var rng = new Random();
+
+                seed = rng.Next();                
+            }
+            else
+            {
+                seed = int.Parse(message.Extra);
+            }
+
+            Dealer.rng = new Random(seed);
+            dealer.Shuffle();
 
             if (message == null)
                 LoadHost();
@@ -178,19 +205,7 @@ namespace UNO
 
         public void LoadHost()
         {
-            isClient = false;
-
-            foreach (var path in Directory.GetFiles(window.imagesPath))
-            {
-                // Create two of each card and add them to the deck
-                for (var i = 1; i <= 2; ++i)
-                {
-                    Card tempcard = new Card(path);
-                    dealer.AddToDeck(tempcard);
-                }
-            }
-
-            dealer.Shuffle();
+            isClient = false;            
 
             // Load players
             int offset = 0;
@@ -237,7 +252,7 @@ namespace UNO
 
             // let players know that we've started
             if (window.lobby.HostID == window.UserID)
-                window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = "begin", PlayerName = window.lobby.clientName, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(currentCard) });
+                window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = "begin", PlayerName = window.lobby.clientName, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(currentCard), Extra = seed.ToString() });
         }
 
         // A key was pressed

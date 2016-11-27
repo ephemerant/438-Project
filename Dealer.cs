@@ -12,7 +12,7 @@ namespace UNO
         // Variables
         //------------------------------
 
-        static Random rng = new Random();
+        public static Random rng;
 
         List<Card> deck = new List<Card>();
 
