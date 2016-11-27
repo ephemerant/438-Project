@@ -64,7 +64,7 @@ namespace UNO
                 }
 
             udpConnect = new UDP { window = this };
-
+            
             UserID = DateTime.Now.Ticks.ToString();
 
             Keyboard.AddKeyUpHandler(this, KeyUpHandler);

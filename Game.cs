@@ -123,7 +123,7 @@ namespace UNO
             {
                 var rng = new Random();
 
-                seed = rng.Next();                
+                seed = rng.Next();
             }
             else
             {
@@ -141,7 +141,7 @@ namespace UNO
 
         public void LoadClient(Message message)
         {
-            isClient = true;            
+            isClient = true;
 
             window.playerList = message.PlayerList;
 
@@ -196,7 +196,7 @@ namespace UNO
 
         public void LoadHost()
         {
-            isClient = false;            
+            isClient = false;
 
             // Load players
             int offset = 0;
@@ -243,7 +243,48 @@ namespace UNO
 
             // let players know that we've started
             if (window.lobby.HostID == window.UserID)
-                window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = "begin", PlayerName = window.lobby.clientName, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(currentCard), Extra = seed.ToString() });
+                BroadcastBegin();
+        }
+
+        public void BroadcastBegin()
+        {
+            var oldTimeout = window.udpConnect.udpResponse.Client.ReceiveTimeout;
+            window.udpConnect.udpResponse.Client.ReceiveTimeout = 50;
+
+            var responses = new Dictionary<string, bool>();
+
+            foreach (var player in window.playerList)
+                if (player.IP != null)
+                    responses.Add(player.ID, false);
+
+            while (true)
+            {
+                var heardFromAll = true;
+
+                foreach (var player in window.playerList)
+                    if (player.IP != null)
+                        heardFromAll = heardFromAll && (responses[player.ID]);
+
+                if (heardFromAll)
+                    break;
+
+                var counter = 0;
+
+                while (++counter <= 3)
+                {
+                    window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = "begin", PlayerName = window.lobby.clientName, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(currentCard), Extra = seed.ToString() });
+
+                    IPEndPoint recvEp = new IPEndPoint(IPAddress.Any, 0);
+
+                    var data = window.udpConnect.udpResponse.Receive(ref recvEp);
+
+                    var text = Encoding.ASCII.GetString(data);
+
+                    var message = new Message(text);
+                }
+            }
+
+            window.udpConnect.udpResponse.Client.ReceiveTimeout = oldTimeout;
         }
 
         // A key was pressed
