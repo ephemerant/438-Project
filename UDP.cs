@@ -208,9 +208,9 @@ namespace UNO
                             }));
                         else if (message.Action == "begin")
                             Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
-                            {                               
+                            {
                                 window.lobby.UnloadHost();
-                                
+
                                 window.StartGame(message);
                             }));
                     }
@@ -224,18 +224,17 @@ namespace UNO
             }
         }
 
-        public void ListenForMoves()
+        public void ListenForMove()
         {
             try
             {
-                while (window.currentScreen == window.game)
-                {
-                    IPEndPoint recvEp = new IPEndPoint(IPAddress.Any, 0);
+                IPEndPoint recvEp = new IPEndPoint(IPAddress.Any, 0);
 
-                    var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
+                var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
 
-                    var message = new Message(text);
-                }
+                var message = new Message(text);
+
+                window.game.Process(message);
             }
             catch (Exception ex)
             {

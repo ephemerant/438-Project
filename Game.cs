@@ -99,6 +99,8 @@ namespace UNO
             window.DrawDeck.Visibility = Visibility.Visible;
             window.turnDirection.Visibility = Visibility.Visible;
 
+            dealer = new Dealer();
+
             if (message == null)
                 LoadHost();
             else
@@ -160,17 +162,19 @@ namespace UNO
 
             loadCurrentCard();
 
-            // TODO: Determine which player we are
+            // Determine which player we are
             player = Shared.GetPlayer(window.UserID, window.playerList);
 
-            //reloadHand();
+            reloadHand();
+
+            // listen for moves
+            var threadListen = new Thread(new ThreadStart(window.udpConnect.ListenForMove));
+            threadListen.Start();
         }
 
         public void LoadHost()
         {
-            isClient = false;
-
-            dealer = new Dealer();
+            isClient = false;            
 
             foreach (var path in Directory.GetFiles(window.imagesPath))
             {
@@ -226,10 +230,6 @@ namespace UNO
             loadCurrentCard();
 
             reloadHand();
-
-            // listen for moves
-            var threadListen = new Thread(new ThreadStart(window.udpConnect.ListenForMoves));
-            threadListen.Start();
 
             // let players know that we've started
             if (window.lobby.HostID == window.UserID)
@@ -392,6 +392,23 @@ namespace UNO
             }
         }
 
+        public void Process(Message message)
+        {           
+            if (message.Action == "draw")
+            {
+                dealer.Deal(currentPlayer, 1);
+                currentPlayer.UpdateLabel();
+
+                // Wait for the remote player to make a move                
+                var threadListen = new Thread(new ThreadStart(window.udpConnect.ListenForMove));
+                threadListen.Start();
+            }
+            else if (message.Action == "card_played")
+            {
+                playCard(Shared.Unstrip(message.Card, clientCards));
+            }
+        }
+
         internal void playCard(Card card)
         {
             // Add the previous card played back to the deck
@@ -421,8 +438,6 @@ namespace UNO
                 window.Window_Loaded(null, null);
                 return;
             }
-
-            BroadcastMove("card_played", currentPlayer.name, card);
 
             // Handle skip & reverse
             switch (card.value)
@@ -457,13 +472,15 @@ namespace UNO
 
             reloadHand(); // Refresh the hand     
 
+            BroadcastMove("card_played", currentPlayer, card);
+
             if (currentPlayer.isComputer)
             {
                 currentPlayer.UpdateLabel();
 
                 while (canDraw(currentPlayer)) // Draw until the computer can make a move
                 {
-                    BroadcastMove("draw", currentPlayer.name);
+                    BroadcastMove("draw", currentPlayer);
 
                     window.Dispatcher.Invoke(DispatcherPriority.Render, emptyDelegate); // Refresh the UI
                     Thread.Sleep(250);
@@ -483,15 +500,18 @@ namespace UNO
                         break;
                     }
             }
-            else if (currentPlayer.IP != null)
+            else if (currentPlayer.IP != player.IP)
             {
-                // Wait
+                // Wait for the remote player to make a move                
+                var threadListen = new Thread(new ThreadStart(window.udpConnect.ListenForMove));
+                threadListen.Start();
             }
         }
 
-        private void BroadcastMove(string action, string player, Card card = null)
+        private void BroadcastMove(string action, Player player, Card card = null)
         {
-            window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = action, PlayerName = player, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(card) });
+            // player: The player whose turn it now is
+            window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = action, PlayerName = player.ID, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(card) });
         }
 
         private bool pointWithinBounds(Point point)
@@ -517,7 +537,7 @@ namespace UNO
             currentPlayer = window.playerList[currentPlayerNumber];
             currentPlayer.IsActive(true);
 
-            if (!currentPlayer.isComputer && currentPlayer.IP == null)
+            if (!currentPlayer.isComputer && currentPlayer.IP == player.IP)
                 player = currentPlayer; // Shared computer
         }
 
@@ -574,7 +594,7 @@ namespace UNO
         {
             if (clickedDraw == true && canDraw())
             {
-                BroadcastMove("draw", currentPlayer.name);
+                BroadcastMove("draw", currentPlayer);
 
                 dealer.Deal(player, 1);
                 clickedDraw = false;
