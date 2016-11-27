@@ -96,17 +96,23 @@ namespace UNO
 
         public void BroadcastHost()
         {
+            var counter = 0;
+
             while (window.currentScreen == window.lobby)
             {
-                var players = new List<Player>();
-
-                foreach (var player in window.playerList)
+                if (counter == 0)
                 {
-                    players.Add(new Player { name = player.name, IP = player.IP, isComputer = player.isComputer });
-                }
+                    var players = new List<Player>();
 
-                SendMessage(new Message { HostID = window.HostID, Action = "hosting", PlayerName = window.lobby.clientName, PlayerList = players });
-                Thread.Sleep(5000);
+                    foreach (var player in window.playerList)
+                    {
+                        players.Add(new Player { name = player.name, IP = player.IP, isComputer = player.isComputer });
+                    }
+
+                    SendMessage(new Message { HostID = window.HostID, Action = "hosting", PlayerName = window.lobby.clientName, PlayerList = players });
+                }
+                counter = (counter + 1) % 50;
+                Thread.Sleep(100);
             }
         }
 
