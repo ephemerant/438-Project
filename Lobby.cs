@@ -21,8 +21,8 @@ namespace UNO
         // Variables
         //------------------------------
 
+        public String clientName;
         MainWindow window;
-        String clientName;
         int comcount;
 
         //------------------------------
@@ -50,7 +50,7 @@ namespace UNO
                     window.menuButtons.RemoveAt(i);
                 }
             }
-            
+
         }
 
         public void UnloadClient()
@@ -133,21 +133,27 @@ namespace UNO
             playButton.MouseEnter += ButtonBeginHover;
             playButton.MouseLeave += ButtonEndHover;
 
-            for(int x = 0; x < 10; x++)
+            for (int x = 0; x < 10; x++)
             {
-                var playerNumber = new Label { Content = (x+1)+ ".", Foreground = Brushes.White, FontSize = 20 };
-                Canvas.SetTop(playerNumber, 12+ (20*x));
+                var playerNumber = new Label { Content = (x + 1) + ".", Foreground = Brushes.White, FontSize = 20 };
+                Canvas.SetTop(playerNumber, 12 + (20 * x));
                 Canvas.SetLeft(playerNumber, 16);
                 window.hostingPlayerList.Children.Add(playerNumber);
             }
-            String inputname = window.udpConnect.getName();
-            window.playerList.Add(new Player(inputname));
+
+            clientName = window.udpConnect.getName();
+
+            window.playerList.Add(new Player(clientName));
             window.playerList[0].isComputer = false;
+
             var labelName = new Label { Content = window.playerList[0].name, Foreground = Brushes.Orange, FontSize = 20 };
+
             Canvas.SetTop(labelName, 12);
             Canvas.SetLeft(labelName, 50);
+
             window.hostingPlayerList.Children.Add(labelName);
             window.playerList[0].labelName = labelName;
+
             reloadPlayerList();
 
             // broadcast that we're hosting
@@ -201,9 +207,9 @@ namespace UNO
         //add computer player
         private void computerPlayerButtonClick(object sender, MouseEventArgs e)
         {
-            if (window.playerList.Count <10)
+            if (window.playerList.Count < 10)
             {
-                Player newPlayer = new Player("com"+ (comcount+1));
+                Player newPlayer = new Player("com" + (comcount + 1));
                 comcount++;
                 newPlayer.isComputer = true;
                 window.playerList.Add(newPlayer);
@@ -214,7 +220,7 @@ namespace UNO
         //add local player
         private void localPlayerButtonClick(object sender, MouseEventArgs e)
         {
-            if(window.playerList.Count < 10)
+            if (window.playerList.Count < 10)
             {
                 String inputname = window.udpConnect.getName();
                 Player newPlayer = new Player(inputname);
@@ -253,8 +259,8 @@ namespace UNO
         private void connectIPButtonClick(object sender, MouseEventArgs e)
         {
             String inputIP = window.udpConnect.getIP();
-            
-            window.udpConnect.SendMessage("a",inputIP);
+
+            window.udpConnect.SendMessage("a", inputIP);
         }
 
         private void deleteButtonClick(object sender, MouseEventArgs e)
@@ -278,7 +284,7 @@ namespace UNO
                 Canvas.SetLeft(playerNumber, 16);
                 window.hostingPlayerList.Children.Add(playerNumber);
             }
-            for (int x=0; x < window.playerList.Count; x++)
+            for (int x = 0; x < window.playerList.Count; x++)
             {
                 Label thisplayer;
                 if (window.playerList[x].isComputer == false)
@@ -289,7 +295,7 @@ namespace UNO
                 {
                     thisplayer = new Label { Content = window.playerList[x].name, Foreground = Brushes.LightBlue, FontSize = 20 };
                 }
-                
+
                 //Label thisplayer = new Label { Content = window.playerList[x].name, Foreground = Brushes.White, FontSize = 20 };
                 Canvas.SetTop(thisplayer, 12 + (20 * x));
                 Canvas.SetLeft(thisplayer, 50);

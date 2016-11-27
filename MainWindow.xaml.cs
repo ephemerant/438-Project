@@ -63,6 +63,7 @@ namespace UNO
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            currentScreen = null;
             udpConnect.udpResponse.Close();   
         }
 

@@ -96,8 +96,8 @@ namespace UNO
         {
             while (window.currentScreen == window.lobby)
             {
-                SendMessage(new Message { HostID = window.HostID, Action = "hosting" });
-                Thread.Sleep(1000);
+                SendMessage(new Message { HostID = window.HostID, Action = "hosting", PlayerName=window.lobby.clientName });
+                Thread.Sleep(5000);
             }
         }
 
@@ -111,9 +111,7 @@ namespace UNO
 
                     var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
 
-                    var message = new Message(text);
-
-                    Console.WriteLine(message);
+                    var message = new Message(text);                    
                 }
             }
             catch (Exception ex)
@@ -135,8 +133,6 @@ namespace UNO
                     var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
 
                     var message = new Message(text);
-
-                    Console.WriteLine(message);
                 }
             }
             catch (Exception ex)
@@ -153,6 +149,7 @@ namespace UNO
         public string HostID { get; set; }
         public string PlayerID { get; set; }
         public string Action { get; set; }
+        public string Extra { get; set; }
         public string PlayerName { get; set; }
         public Card Card { get; set; }
 
