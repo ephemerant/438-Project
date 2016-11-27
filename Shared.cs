@@ -47,5 +47,21 @@ namespace UNO
 
             return players;
         }
+
+        // unstrip functions are intended to restore image/label data
+        public static Card Unstrip(Card card, Card[,] clientCards)
+        {
+            return clientCards[(int)card.color, (int)card.value];
+        }
+
+        public static List<Card> Unstrip(List<Card> hand, Card[,] clientCards)
+        {
+            var cards = new List<Card>();
+
+            foreach (var card in hand)
+                cards.Add(Unstrip(card, clientCards));
+
+            return cards;
+        }
     }
 }

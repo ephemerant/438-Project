@@ -36,7 +36,7 @@ namespace UNO
         Card draggedCard; // The value of the card being dragged
         Card currentCard; // The current card in play
 
-        bool clickedDraw = false;//this is used to determine if player pressed down on deck
+        bool clickedDraw = false; //this is used to determine if player pressed down on deck
 
         Dealer dealer;
 
@@ -47,6 +47,8 @@ namespace UNO
 
         MainWindow window;
         bool isClient = false;
+
+        Card[,] clientCards = new Card[5, 15]; // store cards by color and value
 
         //------------------------------
         // Functions
@@ -106,6 +108,59 @@ namespace UNO
         public void LoadClient(Message message)
         {
             isClient = true;
+
+            foreach (var path in Directory.GetFiles(window.imagesPath))
+            {
+                // Create two of each card and store them
+                for (var i = 1; i <= 2; ++i)
+                {
+                    Card tempcard = new Card(path);
+                    clientCards[(int)tempcard.color, (int)tempcard.value] = tempcard;
+                }
+            }
+
+            // Load players
+            int offset = 0;
+
+            foreach (Player thisplayer in window.playerList)
+            {
+                var labelName = new Label { Content = thisplayer.name, Foreground = Brushes.White, FontSize = 20 };
+                Canvas.SetTop(labelName, offset);
+                Canvas.SetLeft(labelName, 10);
+                window.players.Children.Add(labelName);
+
+                thisplayer.labelName = labelName;
+
+                thisplayer.hand = Shared.Unstrip(thisplayer.hand, clientCards);
+
+                var labelCards = new Label { Foreground = Brushes.White, FontSize = 14 };
+
+                Canvas.SetTop(labelCards, offset + 25);
+                Canvas.SetLeft(labelCards, 10);
+                window.players.Children.Add(labelCards);
+
+                thisplayer.labelCards = labelCards;
+                thisplayer.UpdateLabel();
+
+                thisplayer.IsActive(false); // Dim their labels
+
+                offset += 50;
+            }
+
+            turnsReversed = false;
+
+            // Load the current card
+            currentCard = Shared.Unstrip(message.Card, clientCards);
+
+            currentPlayerNumber = 0;
+            currentPlayer = window.playerList[0];
+            currentPlayer.IsActive(true); // Brighten their labels            
+
+            loadCurrentCard();
+
+            // TODO: Determine which player we are
+            // player = me;
+            //reloadHand();
         }
 
         public void LoadHost()
@@ -116,17 +171,17 @@ namespace UNO
 
             foreach (var path in Directory.GetFiles(window.imagesPath))
             {
-                // Create two of each card
+                // Create two of each card and add them to the deck
                 for (var i = 1; i <= 2; ++i)
                 {
                     Card tempcard = new Card(path);
                     dealer.AddToDeck(tempcard);
                 }
-            }            
+            }
 
             dealer.Shuffle();
 
-            // Simulate players
+            // Load players
             int offset = 0;
 
             foreach (Player thisplayer in window.playerList)
