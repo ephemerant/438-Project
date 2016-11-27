@@ -155,8 +155,8 @@ namespace UNO
             threadBroadcast.Start();
 
             // listen for clients wanting to join
-            var threadListen = new Thread(new ThreadStart(window.udpConnect.ReceiveMessage));
-            threadListen.Start();                        
+            var threadListen = new Thread(new ThreadStart(window.udpConnect.ListenForClients));
+            threadListen.Start();
         }
 
         public void LoadClient()
@@ -182,16 +182,20 @@ namespace UNO
             returnToMenuButton.MouseLeave += ButtonEndHover;
 
             //load Connect to IP
-            var connectIP = Shared.LoadImage(Path.Combine(window.resourcesPath, "connectIP.png"), 198, 58);
-            Canvas.SetTop(connectIP, 400);
-            Canvas.SetLeft(connectIP, 520);
-            window.canvas.Children.Add(connectIP);
-            window.menuButtons.Add(connectIP);
+            //var connectIP = Shared.LoadImage(Path.Combine(window.resourcesPath, "connectIP.png"), 198, 58);
+            //Canvas.SetTop(connectIP, 400);
+            //Canvas.SetLeft(connectIP, 520);
+            //window.canvas.Children.Add(connectIP);
+            //window.menuButtons.Add(connectIP);
 
-            connectIP.MouseLeftButtonUp += connectIPButtonClick;
-            connectIP.MouseEnter += ButtonBeginHover;
-            connectIP.MouseLeave += ButtonEndHover;
+            //connectIP.MouseLeftButtonUp += connectIPButtonClick;
+            //connectIP.MouseEnter += ButtonBeginHover;
+            //connectIP.MouseLeave += ButtonEndHover;
             clientName = window.udpConnect.getName();
+
+            // listen for hosts
+            var threadListen = new Thread(new ThreadStart(window.udpConnect.ListenForHosts));
+            threadListen.Start();
         }
 
         //add computer player

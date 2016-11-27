@@ -7,7 +7,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.Threading;
 using System.ComponentModel;
-
+using Newtonsoft.Json;
 
 namespace UNO
 {
@@ -34,7 +34,7 @@ namespace UNO
             return IP;
         }
 
-        public void SendMessage(string message)
+        public void SendMessage(object message)
         {
             // send via UDP
             UdpClient client = new UdpClient(24242, AddressFamily.InterNetwork);
@@ -43,9 +43,9 @@ namespace UNO
             IPEndPoint groupEp = new IPEndPoint(IPAddress.Broadcast, 42424);
             client.Connect(groupEp);
 
-            var data = Encoding.ASCII.GetBytes(message);
-
+            var data = Encoding.ASCII.GetBytes(message.ToString());
             client.Send(data, data.Length);
+
             client.Close();
         }
 
@@ -96,15 +96,65 @@ namespace UNO
         {
             while (window.currentScreen == window.lobby)
             {
-                SendMessage("I'm hosting!");
+                SendMessage(new Message { HostID = window.HostID, Action = "hosting" });
                 Thread.Sleep(1000);
             }
         }
+
+        public void ListenForClients()
+        {
+            try
+            {
+                while (window.currentScreen == window.lobby)
+                {
+                    IPEndPoint recvEp = new IPEndPoint(IPAddress.Any, 0);
+
+                    var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
+
+                    var message = new Message(text);
+
+                    Console.WriteLine(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                // did we force close the connection?
+                if (ex.Message != "A blocking operation was interrupted by a call to WSACancelBlockingCall")
+                    throw ex;
+            }
+        }
+
+        public void ListenForHosts()
+        {
+            try
+            {
+                while (window.currentScreen == window.lobby)
+                {
+                    IPEndPoint recvEp = new IPEndPoint(IPAddress.Any, 0);
+
+                    var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
+
+                    var message = new Message(text);
+
+                    Console.WriteLine(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                // did we force close the connection?
+                if (ex.Message != "A blocking operation was interrupted by a call to WSACancelBlockingCall")
+                    throw ex;
+            }
+        }
     }
+
     public class Message
     {
-        public string Name { get; set; }
-        public string IP { get; set; }
+        public string HostID { get; set; }
+        public string PlayerID { get; set; }
+        public string Action { get; set; }
+        public string PlayerName { get; set; }
+        public Card Card { get; set; }
 
         public Message()
         {
@@ -113,20 +163,20 @@ namespace UNO
 
         public Message(string data)
         {
-            if (data.Contains("|"))
-            {
-                var values = data.Split('|');
+            Console.WriteLine(data);
 
-                Name = values[0];
-                IP = values[1];
-            }
-            else
-                Name = data;
+            var message = JsonConvert.DeserializeObject<Message>(data);
+
+            HostID = message.HostID;
+            PlayerID = message.PlayerID;
+            Action = message.Action;
+            PlayerName = message.PlayerName;
+            Card = message.Card;
         }
 
         public override string ToString()
         {
-            return string.Format("{0}|{1}", Name, IP);
+            return JsonConvert.SerializeObject(this);
         }
     }
 }
