@@ -234,7 +234,10 @@ namespace UNO
 
                 var message = new Message(text);
 
-                window.game.Process(message);
+                Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
+                {
+                    window.game.Process(message);
+                }));
             }
             catch (Exception ex)
             {
@@ -254,6 +257,7 @@ namespace UNO
         public string PlayerName { get; set; }
         public List<Player> PlayerList { get; set; }
         public Card Card { get; set; }
+        public int TurnCount { get; set; }
 
         public Message()
         {
@@ -273,6 +277,7 @@ namespace UNO
             PlayerList = message.PlayerList;
             Card = message.Card;
             Extra = message.Extra;
+            TurnCount = message.TurnCount;
         }
 
         public override string ToString()

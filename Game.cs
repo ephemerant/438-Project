@@ -50,6 +50,8 @@ namespace UNO
 
         Card[,] clientCards = new Card[5, 15]; // store cards by color and value
 
+        int turnCount;
+
         //------------------------------
         // Functions
         //------------------------------
@@ -67,6 +69,7 @@ namespace UNO
         public void Load(MainWindow window, Message message = null)
         {
             this.window = window;
+            turnCount = 0;
 
             // Arrows
             var arrow = Shared.LoadImage(Path.Combine(window.resourcesPath, "arrow-right.png"), 25, 45);
@@ -174,7 +177,7 @@ namespace UNO
 
         public void LoadHost()
         {
-            isClient = false;            
+            isClient = false;
 
             foreach (var path in Directory.GetFiles(window.imagesPath))
             {
@@ -393,7 +396,18 @@ namespace UNO
         }
 
         public void Process(Message message)
-        {           
+        {
+            if (message.TurnCount <= turnCount)
+            {
+                // Wait for the remote player to make a move                
+                var threadListen = new Thread(new ThreadStart(window.udpConnect.ListenForMove));
+                threadListen.Start();
+
+                return;
+            }
+
+            turnCount = message.TurnCount;
+
             if (message.Action == "draw")
             {
                 dealer.Deal(currentPlayer, 1);
@@ -511,7 +525,7 @@ namespace UNO
         private void BroadcastMove(string action, Player player, Card card = null)
         {
             // player: The player whose turn it now is
-            window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = action, PlayerName = player.ID, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(card) });
+            window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = action, PlayerName = player.ID, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(card), TurnCount = ++turnCount });
         }
 
         private bool pointWithinBounds(Point point)
