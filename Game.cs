@@ -46,6 +46,7 @@ namespace UNO
         bool turnsReversed = false;
 
         MainWindow window;
+        bool isClient = false;
 
         //------------------------------
         // Functions
@@ -61,41 +62,9 @@ namespace UNO
             window.inPlay.Children.Clear();
         }
 
-        public void Load(MainWindow window)
+        public void Load(MainWindow window, Message message = null)
         {
             this.window = window;
-
-            dealer = new Dealer();
-
-            foreach (var path in Directory.GetFiles(window.imagesPath))
-            {
-                // Create two of each card
-                for (var i = 1; i <= 2; ++i)
-                {
-                    Card tempcard = new Card(path);
-                    dealer.AddToDeck(tempcard);
-                }
-            }
-
-            draggedOffset = 0;
-
-            window.players.Visibility = Visibility.Visible;
-            window.hand.Visibility = Visibility.Visible;
-            window.inPlay.Visibility = Visibility.Visible;
-            window.DrawDeck.Visibility = Visibility.Visible;
-            window.turnDirection.Visibility = Visibility.Visible;
-
-            string[] possibleDirectories = { @"resources", @"..\..\resources" };
-
-            foreach (var dir in possibleDirectories)
-                if (Directory.Exists(dir))
-                {
-                    window.resourcesPath = Path.GetFullPath(dir);
-                    window.imagesPath = Path.Combine(window.resourcesPath, "cards");
-                    break;
-                }
-
-            dealer.Shuffle();
 
             // Arrows
             var arrow = Shared.LoadImage(Path.Combine(window.resourcesPath, "arrow-right.png"), 25, 45);
@@ -119,6 +88,43 @@ namespace UNO
             arrow.MouseEnter += ArrowBeginHover;
             arrow.MouseLeftButtonUp += LeftArrowLeftButtonUp;
             arrow.MouseLeave += ArrowEndHover;
+
+            draggedOffset = 0;
+
+            window.players.Visibility = Visibility.Visible;
+            window.hand.Visibility = Visibility.Visible;
+            window.inPlay.Visibility = Visibility.Visible;
+            window.DrawDeck.Visibility = Visibility.Visible;
+            window.turnDirection.Visibility = Visibility.Visible;
+
+            if (message == null)
+                LoadHost();
+            else
+                LoadClient(message);
+        }
+
+        public void LoadClient(Message message)
+        {
+            isClient = true;
+        }
+
+        public void LoadHost()
+        {
+            isClient = false;
+
+            dealer = new Dealer();
+
+            foreach (var path in Directory.GetFiles(window.imagesPath))
+            {
+                // Create two of each card
+                for (var i = 1; i <= 2; ++i)
+                {
+                    Card tempcard = new Card(path);
+                    dealer.AddToDeck(tempcard);
+                }
+            }            
+
+            dealer.Shuffle();
 
             // Simulate players
             int offset = 0;
