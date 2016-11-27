@@ -115,15 +115,6 @@ namespace UNO
                     Card tempcard = new Card(path);
                     tempcard.ID = cardsByID.Count;
                     cardsByID.Add(tempcard);
-                }
-            }
-
-            foreach (var path in Directory.GetFiles(window.imagesPath))
-            {
-                // Create two of each card and add them to the deck
-                for (var i = 1; i <= 2; ++i)
-                {
-                    Card tempcard = new Card(path);
                     dealer.AddToDeck(tempcard);
                 }
             }
