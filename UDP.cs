@@ -207,12 +207,16 @@ namespace UNO
                                 window.lobby.reloadPlayerList(false);
                             }));
                         else if (message.Action == "begin")
+                        {
                             Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
                             {
                                 window.lobby.UnloadHost();
 
                                 window.StartGame(message);
                             }));
+
+                            return;
+                        }
                     }
                 }
             }
