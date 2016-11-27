@@ -319,7 +319,7 @@ namespace UNO
             }
         }
 
-        private void reloadPlayerList(bool isHost)
+        public void reloadPlayerList(bool isHost)
         {
             window.hostingPlayerList.Children.Clear();
 

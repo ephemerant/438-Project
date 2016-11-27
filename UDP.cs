@@ -160,23 +160,57 @@ namespace UNO
                     var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
 
                     var message = new Message(text);
-                    Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
+
+                    if (message.Action.Equals("hosting") && !window.lobby.hosts.ContainsKey(message.HostID))
                     {
-                        if (message.Action.Equals("hosting") && !window.lobby.hosts.ContainsKey(message.HostID))
+                        Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
                         {
                             window.lobby.hosts.Add(message.HostID, message.PlayerName);
                             window.lobby.reloadHostList();
-                        }
-                        if (message.Action.Equals("joinAck") && window.lobby.hosts.ContainsKey(message.HostID) && message.PlayerID == window.UserID)
+                        }));
+                    }
+                    if (message.Action.Equals("joinAck") && window.lobby.hosts.ContainsKey(message.HostID) && message.PlayerID == window.UserID)
+                    {
+                        Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
                         {
                             SendMessage(new Message { HostID = message.HostID, PlayerID = window.UserID, Action = "joinAckAck", PlayerName = window.lobby.clientName, Extra = recvEp.Address.ToString() });
                             window.lobby.UnloadClient();
                             window.lobby.HostID = message.HostID;
                             window.lobby.LoadWaiting();
-                        }
+                        }));
+                        return;
+                    }
 
-                    }));
+                }
+            }
+            catch (Exception ex)
+            {
+                // did we force close the connection?
+                if (ex.Message != "A blocking operation was interrupted by a call to WSACancelBlockingCall")
+                    throw ex;
+            }
+        }
 
+        public void ListenForPlayerList()
+        {
+            try
+            {
+                while (window.currentScreen == window.lobby)
+                {
+                    IPEndPoint recvEp = new IPEndPoint(IPAddress.Any, 0);
+
+                    var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
+
+                    var message = new Message(text);
+
+                    if (message.Action.Equals("hosting") && window.lobby.HostID == message.HostID)
+                    {
+                        Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
+                        {
+                            window.playerList = message.PlayerList;
+                            window.lobby.reloadPlayerList(false);
+                        }));
+                    }
                 }
             }
             catch (Exception ex)
