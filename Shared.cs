@@ -9,17 +9,43 @@ using System.Windows.Media.Imaging;
 
 namespace UNO
 {
-    static class Shared
+    public static class Shared
     {
-        internal static Image LoadImage(string path, double w, double h)
+        public static Image LoadImage(string path, double w, double h)
         {           
-            // Load the image
+            // load the image
             BitmapImage src = new BitmapImage();
             src.BeginInit();
             src.UriSource = new Uri(path);
             src.EndInit();
 
             return new Image { Source = src, Width = w, Height = h };
+        }
+
+        // strip functions are intended to strip away image/label data for JSON serialization
+        public static Card Strip(Card card)
+        {
+            return card == null ? card : new Card { value = card.value, color = card.color };
+        }
+
+        public static List<Card> Strip(List<Card> playerHand)
+        {
+            var cards = new List<Card>();
+
+            foreach (var card in playerHand)
+                cards.Add(Strip(card));
+
+            return cards;
+        }
+
+        public static List<Player> Strip(List<Player> playerList)
+        {
+            var players = new List<Player>();
+
+            foreach (var player in playerList)
+                players.Add(new Player { name = player.name, IP = player.IP, isComputer = player.isComputer, hand = Strip(player.hand) });
+
+            return players;
         }
     }
 }

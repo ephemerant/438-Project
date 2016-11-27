@@ -101,15 +101,10 @@ namespace UNO
             while (window.currentScreen == window.lobby)
             {
                 if (counter == 0)
-                {
-                    var players = new List<Player>();
+                    SendMessage(new Message { HostID = window.UserID, Action = "hosting", PlayerName = window.lobby.clientName, PlayerList = Shared.Strip(window.playerList) });
 
-                    foreach (var player in window.playerList)
-                        players.Add(new Player { name = player.name, IP = player.IP, isComputer = player.isComputer });
-
-                    SendMessage(new Message { HostID = window.UserID, Action = "hosting", PlayerName = window.lobby.clientName, PlayerList = players });
-                }
                 counter = (counter + 1) % 50;
+
                 Thread.Sleep(100);
             }
         }
@@ -126,21 +121,17 @@ namespace UNO
 
                     var message = new Message(text);
 
-                    if (message.HostID == window.UserID && message.Action == "join")
+                    // if the message is from a client talking to us
+                    if (message.HostID == window.UserID)
                     {
-                        var players = new List<Player>();
+                        if (message.Action == "join")
+                            SendMessage(new Message { HostID = window.UserID, Action = "joinAck", PlayerID = message.PlayerID, PlayerName = message.PlayerName, PlayerList = Shared.Strip(window.playerList) });
 
-                        foreach (var player in window.playerList)
-                            players.Add(new Player { name = player.name, IP = player.IP, isComputer = player.isComputer });
-
-                        SendMessage(new Message { HostID = window.UserID, Action = "joinAck", PlayerID = message.PlayerID, PlayerName = message.PlayerName, PlayerList = players });
-                    }
-                    if (message.HostID == window.UserID && message.Action == "joinAckAck")
-                    {
-                        Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
-                        {
-                            window.lobby.addClient(message);
-                        }));
+                        if (message.Action == "joinAckAck")
+                            Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
+                            {
+                                window.lobby.addClient(message);
+                            }));
                     }
                 }
             }

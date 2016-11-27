@@ -167,15 +167,9 @@ namespace UNO
             var threadListen = new Thread(new ThreadStart(window.udpConnect.ListenForMoves));
             threadListen.Start();
 
+            // let players know that we've started
             if (window.lobby.HostID == window.UserID)
-            {
-                var players = new List<Player>();
-
-                foreach (var player in window.playerList)
-                    players.Add(new Player { name = player.name, IP = player.IP, isComputer = player.isComputer, CardCount = player.hand.Count });
-
-                window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = "begin", PlayerName = window.lobby.clientName, PlayerList = players });
-            }
+                window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = "begin", PlayerName = window.lobby.clientName, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(currentCard) });
         }
 
         // A key was pressed
@@ -433,10 +427,7 @@ namespace UNO
 
         private void BroadcastMove(string action, string player, Card card = null)
         {
-            if (card != null)
-                card = new Card { value = card.value, color = card.color };
-
-            window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = action, PlayerName = player, Card = card });
+            window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = action, PlayerName = player, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(card) });
         }
 
         private bool pointWithinBounds(Point point)
