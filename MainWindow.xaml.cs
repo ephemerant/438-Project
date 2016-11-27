@@ -33,7 +33,7 @@ namespace UNO
         public List<Player> playerList = new List<Player>();
         public Game game = new Game();
         public Lobby lobby = new Lobby();
-        public MainMenu menu = new MainMenu();        
+        public MainMenu menu = new MainMenu();
 
         //copied from tictactoe
         public bool wServer = false;
@@ -61,10 +61,10 @@ namespace UNO
             Closing += Window_Closing;
         }
 
-        private void Window_Closing(object sender, CancelEventArgs e)
+        public void Window_Closing(object sender, CancelEventArgs e)
         {
             currentScreen = null;
-            udpConnect.udpResponse.Close();   
+            udpConnect.udpResponse.Close();
         }
 
         private void KeyUpHandler(object sender, KeyEventArgs e)
@@ -133,7 +133,11 @@ namespace UNO
 
         public void CanvasMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            currentScreen.CanvasMouseLeftButtonUp(sender, e);
+            try
+            {
+                currentScreen.CanvasMouseLeftButtonUp(sender, e);
+            }
+            catch { }
         }
 
         public void CanvasMouseMove(object sender, MouseEventArgs e)
