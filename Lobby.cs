@@ -31,6 +31,7 @@ namespace UNO
 
         public void Unload(bool isHost)
         {
+            window.canvas.Children.Clear();
             if (isHost)
                 UnloadHost();
             else
@@ -147,6 +148,7 @@ namespace UNO
             Canvas.SetLeft(labelName, 50);
             window.hostingPlayerList.Children.Add(labelName);
             window.playerList[0].labelName = labelName;
+            reloadPlayerList();
 
             // broadcast that we're hosting
             var threadBroadcast = new Thread(new ThreadStart(window.udpConnect.BroadcastHost));
@@ -251,6 +253,16 @@ namespace UNO
             window.udpConnect.SendMessage("a",inputIP);
         }
 
+        private void deleteButtonClick(object sender, MouseEventArgs e)
+        {
+            if (e.Source != null)
+            {
+                var image = (Image)e.Source;
+                window.playerList.RemoveAt((int)image.Tag);
+                reloadPlayerList();
+            }
+        }
+
         private void reloadPlayerList()
         {
             window.hostingPlayerList.Children.Clear();
@@ -273,9 +285,19 @@ namespace UNO
                 {
                     thisplayer = new Label { Content = window.playerList[x].name, Foreground = Brushes.LightBlue, FontSize = 20 };
                 }
+                
                 //Label thisplayer = new Label { Content = window.playerList[x].name, Foreground = Brushes.White, FontSize = 20 };
                 Canvas.SetTop(thisplayer, 12 + (20 * x));
                 Canvas.SetLeft(thisplayer, 50);
+                if (x > 0)
+                {
+                    var delete = Shared.LoadImage(Path.Combine(window.resourcesPath, "delete.png"), 20, 20);
+                    delete.Tag = x;
+                    Canvas.SetTop(delete, 20 + (20 * x));
+                    Canvas.SetLeft(delete, 400);
+                    window.hostingPlayerList.Children.Add(delete);
+                    delete.MouseLeftButtonUp += deleteButtonClick;
+                }
                 window.hostingPlayerList.Children.Add(thisplayer);
                 window.playerList[x].labelName = thisplayer;
             }
