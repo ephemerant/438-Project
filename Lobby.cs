@@ -289,7 +289,7 @@ namespace UNO
             for (int x = 0; x < window.playerList.Count; x++)
             {
                 Label thisplayer;
-                if (window.playerList[x].isComputer == false)
+                if (window.playerList[x].isComputer == false && window.playerList[x].IP == null)
                 {
                     thisplayer = new Label { Content = window.playerList[x].name, Foreground = Brushes.Orange, FontSize = 20 };
                 }
