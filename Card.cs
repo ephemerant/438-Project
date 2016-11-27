@@ -36,13 +36,18 @@ namespace UNO
         // Functions
         //------------------------------
 
+        public Card()
+        {
+
+        }
+
         public Card(string path)
         {
             image = Shared.LoadImage(path, 100 * cardScale, 150 * cardScale);
 
             // Pull color & value from the file name
             string name = Path.GetFileNameWithoutExtension(path);
-            LoadType(name);            
+            LoadType(name);
         }
 
         void LoadType(string name)
@@ -50,7 +55,7 @@ namespace UNO
             if (name == "wild" || name == "draw4")
             {
                 color = COLOR.WILD;
-                
+
                 if (name == "draw4")
                     value = CARD.DRAW_4;
                 else

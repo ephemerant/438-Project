@@ -154,6 +154,27 @@ namespace UNO
                     throw ex;
             }
         }
+
+        public void ListenForMoves()
+        {
+            try
+            {
+                while (window.currentScreen == window.game)
+                {
+                    IPEndPoint recvEp = new IPEndPoint(IPAddress.Any, 0);
+
+                    var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
+
+                    var message = new Message(text);
+                }
+            }
+            catch (Exception ex)
+            {
+                // did we force close the connection?
+                if (ex.Message != "A blocking operation was interrupted by a call to WSACancelBlockingCall")
+                    throw ex;
+            }
+        }
     }
 
     public class Message

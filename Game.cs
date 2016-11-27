@@ -15,6 +15,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using System.Windows.Threading;
+using System.Threading;
 
 namespace UNO
 {
@@ -44,7 +45,7 @@ namespace UNO
         int currentPlayerNumber = 0;//the number of the current player.
         bool turnsReversed = false;
 
-        
+
 
         MainWindow window;
 
@@ -65,7 +66,7 @@ namespace UNO
         public void Load(MainWindow window)
         {
             this.window = window;
-            
+
 
             dealer = new Dealer();
 
@@ -126,7 +127,7 @@ namespace UNO
             int offset = 0;
 
             foreach (Player thisplayer in window.playerList)
-            { 
+            {
                 var labelName = new Label { Content = thisplayer.name, Foreground = Brushes.White, FontSize = 20 };
                 Canvas.SetTop(labelName, offset);
                 Canvas.SetLeft(labelName, 10);
@@ -164,6 +165,10 @@ namespace UNO
             loadCurrentCard();
 
             reloadHand();
+
+            // listen for moves
+            var threadListen = new Thread(new ThreadStart(window.udpConnect.ListenForMoves));
+            threadListen.Start();
         }
 
         // A key was pressed
@@ -352,6 +357,8 @@ namespace UNO
                 return;
             }
 
+            BroadcastMove("card_played", currentPlayer.name, card);
+
             // Handle skip & reverse
             switch (card.value)
             {
@@ -370,7 +377,7 @@ namespace UNO
                     break;
                 case CARD.SKIP:
                     nextPlayer(); break;
-            }
+            }            
 
             nextPlayer(); // Move to the next player                                                        
 
@@ -391,32 +398,35 @@ namespace UNO
 
                 while (canDraw(currentPlayer)) // Draw until the computer can make a move
                 {
-                    Console.WriteLine("Drawing...");
+                    BroadcastMove("draw", currentPlayer.name);
 
                     window.Dispatcher.Invoke(DispatcherPriority.Render, emptyDelegate); // Refresh the UI
-                    System.Threading.Thread.Sleep(250);
+                    Thread.Sleep(250);
 
                     dealer.Deal(currentPlayer, 1);
                     currentPlayer.UpdateLabel();
                 }
 
                 window.Dispatcher.Invoke(DispatcherPriority.Render, emptyDelegate); // Refresh the UI
-                System.Threading.Thread.Sleep(250);
+                Thread.Sleep(250);
 
                 foreach (var playableCard in currentPlayer.hand)
                     if (isValidPlay(playableCard))
                     {
-                        Console.WriteLine("{0} played a {1} {2}", currentPlayer.name, playableCard.color, playableCard.value);
-
                         // Play the card
                         playCard(playableCard);
                         break;
                     }
             }
-            else
-                Console.WriteLine("Your turn!");
         }
 
+        private void BroadcastMove(string action, string player, Card card = null)
+        {
+            if (card != null)
+                card = new Card { value = card.value, color = card.color };
+
+            window.udpConnect.SendMessage(new Message { HostID = window.HostID, Action = action, PlayerName = player, Card = card });
+        }
 
         private bool pointWithinBounds(Point point)
         {
@@ -527,7 +537,7 @@ namespace UNO
                 var card = player.hand[player.handOffset + counter];
                 Image placeCard = card.image;
 
-                if (player == currentPlayer &&isValidPlay(card))
+                if (player == currentPlayer && isValidPlay(card))
                     card.image.Opacity = 1;
                 else
                     card.image.Opacity = 0.5;
