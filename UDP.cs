@@ -15,7 +15,7 @@ namespace UNO
     {
         public string name = "";
 
-        UdpClient udpResponse = new UdpClient(42424, AddressFamily.InterNetwork);
+        public UdpClient udpResponse = new UdpClient(42424, AddressFamily.InterNetwork);
 
         public String getName()
         {

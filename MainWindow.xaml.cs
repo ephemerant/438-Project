@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.IO;
 using System.Windows.Threading;
+using System.ComponentModel;
+using System.Net.Sockets;
 
 namespace UNO
 {
@@ -31,15 +33,16 @@ namespace UNO
         public List<Player> playerList = new List<Player>();
         public Game game = new Game();
         public Lobby lobby = new Lobby();
-        public MainMenu menu = new MainMenu();
-        public Network network = new Network();
-        public UDP udpconnect = new UDP();
+        public MainMenu menu = new MainMenu();        
 
         //copied from tictactoe
         public bool wServer = false;
         public bool wClient = false;
 
         Screen currentScreen;
+
+        //networking
+        public UDP udpconnect = new UDP();
 
         //------------------------------
         // Functions
@@ -50,6 +53,13 @@ namespace UNO
             InitializeComponent();
 
             Keyboard.AddKeyUpHandler(this, KeyUpHandler);
+
+            Closing += Window_Closing;
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            udpconnect.udpResponse.Close();   
         }
 
         private void KeyUpHandler(object sender, KeyEventArgs e)
