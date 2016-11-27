@@ -516,6 +516,8 @@ namespace UNO
         {
             if (clickedDraw == true && canDraw())
             {
+                BroadcastMove("draw", currentPlayer.name);
+
                 dealer.Deal(player, 1);
                 clickedDraw = false;
 
