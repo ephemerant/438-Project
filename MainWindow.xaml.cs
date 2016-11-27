@@ -39,10 +39,10 @@ namespace UNO
         public bool wServer = false;
         public bool wClient = false;
 
-        Screen currentScreen;
+        public Screen currentScreen;
 
         //networking
-        public UDP udpconnect = new UDP();
+        public UDP udpConnect;
 
         //------------------------------
         // Functions
@@ -52,6 +52,8 @@ namespace UNO
         {
             InitializeComponent();
 
+            udpConnect = new UDP { window = this };
+
             Keyboard.AddKeyUpHandler(this, KeyUpHandler);
 
             Closing += Window_Closing;
@@ -59,7 +61,7 @@ namespace UNO
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            udpconnect.udpResponse.Close();   
+            udpConnect.udpResponse.Close();   
         }
 
         private void KeyUpHandler(object sender, KeyEventArgs e)

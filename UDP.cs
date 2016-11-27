@@ -14,6 +14,7 @@ namespace UNO
     public class UDP
     {
         public string name = "";
+        public MainWindow window;
 
         public UdpClient udpResponse = new UdpClient(42424, AddressFamily.InterNetwork);
 
@@ -91,6 +92,14 @@ namespace UNO
             udpResponse.Close();
         }
 
+        public void BroadcastHost()
+        {
+            while (window.currentScreen == window.lobby)
+            {
+                SendMessage("I'm hosting!");
+                Thread.Sleep(1000);
+            }
+        }
     }
     public class Message
     {
@@ -104,10 +113,15 @@ namespace UNO
 
         public Message(string data)
         {
-            var values = data.Split('|');
+            if (data.Contains("|"))
+            {
+                var values = data.Split('|');
 
-            Name = values[0];
-            IP = values[1];
+                Name = values[0];
+                IP = values[1];
+            }
+            else
+                Name = data;
         }
 
         public override string ToString()

@@ -24,7 +24,6 @@ namespace UNO
         MainWindow window;
         String clientName;
         int comcount;
-        Thread thread;
 
         //------------------------------
         // Functions
@@ -140,7 +139,7 @@ namespace UNO
                 Canvas.SetLeft(playerNumber, 16);
                 window.hostingPlayerList.Children.Add(playerNumber);
             }
-            String inputname = window.udpconnect.getName();
+            String inputname = window.udpConnect.getName();
             window.playerList.Add(new Player(inputname));
             window.playerList[0].isComputer = false;
             var labelName = new Label { Content = window.playerList[0].name, Foreground = Brushes.Orange, FontSize = 20 };
@@ -149,8 +148,13 @@ namespace UNO
             window.hostingPlayerList.Children.Add(labelName);
             window.playerList[0].labelName = labelName;
 
-            thread = new Thread(new ThreadStart(window.udpconnect.ReceiveMessage));
-            thread.Start();
+            // broadcast that we're hosting
+            var threadBroadcast = new Thread(new ThreadStart(window.udpConnect.BroadcastHost));
+            threadBroadcast.Start();
+
+            // listen for clients wanting to join
+            var threadListen = new Thread(new ThreadStart(window.udpConnect.ReceiveMessage));
+            threadListen.Start();                        
         }
 
         public void LoadClient()
@@ -185,7 +189,7 @@ namespace UNO
             connectIP.MouseLeftButtonUp += connectIPButtonClick;
             connectIP.MouseEnter += ButtonBeginHover;
             connectIP.MouseLeave += ButtonEndHover;
-            clientName = window.udpconnect.getName();
+            clientName = window.udpConnect.getName();
         }
 
         //add computer player
@@ -206,7 +210,7 @@ namespace UNO
         {
             if(window.playerList.Count < 10)
             {
-                String inputname = window.udpconnect.getName();
+                String inputname = window.udpConnect.getName();
                 Player newPlayer = new Player(inputname);
                 newPlayer.isComputer = false;
                 window.playerList.Add(newPlayer);
@@ -242,9 +246,9 @@ namespace UNO
 
         private void connectIPButtonClick(object sender, MouseEventArgs e)
         {
-            String inputIP = window.udpconnect.getIP();
+            String inputIP = window.udpConnect.getIP();
             
-            window.udpconnect.SendMessage("a",inputIP);
+            window.udpConnect.SendMessage("a",inputIP);
         }
 
         private void reloadPlayerList()
