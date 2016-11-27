@@ -377,7 +377,7 @@ namespace UNO
                     break;
                 case CARD.SKIP:
                     nextPlayer(); break;
-            }            
+            }
 
             nextPlayer(); // Move to the next player                                                        
 
@@ -418,6 +418,10 @@ namespace UNO
                         break;
                     }
             }
+            else if (currentPlayer.IP != null)
+            {
+                // Wait
+            }
         }
 
         private void BroadcastMove(string action, string player, Card card = null)
@@ -425,7 +429,7 @@ namespace UNO
             if (card != null)
                 card = new Card { value = card.value, color = card.color };
 
-            window.udpConnect.SendMessage(new Message { HostID = window.HostID, Action = action, PlayerName = player, Card = card });
+            window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = action, PlayerName = player, Card = card });
         }
 
         private bool pointWithinBounds(Point point)
@@ -451,7 +455,7 @@ namespace UNO
             currentPlayer = window.playerList[currentPlayerNumber];
             currentPlayer.IsActive(true);
 
-            if (!currentPlayer.isComputer)
+            if (!currentPlayer.isComputer && currentPlayer.IP == null)
                 player = currentPlayer; // Shared computer
         }
 

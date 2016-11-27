@@ -109,7 +109,7 @@ namespace UNO
                         players.Add(new Player { name = player.name, IP = player.IP, isComputer = player.isComputer });
                     }
 
-                    SendMessage(new Message { HostID = window.HostID, Action = "hosting", PlayerName = window.lobby.clientName, PlayerList = players });
+                    SendMessage(new Message { HostID = window.UserID, Action = "hosting", PlayerName = window.lobby.clientName, PlayerList = players });
                 }
                 counter = (counter + 1) % 50;
                 Thread.Sleep(100);
@@ -128,11 +128,11 @@ namespace UNO
 
                     var message = new Message(text);
 
-                    if (message.HostID == window.HostID && message.Action == "join")
+                    if (message.HostID == window.UserID && message.Action == "join")
                     {
-                        SendMessage(new Message { HostID = window.HostID, Action = "joinAck", PlayerID = message.PlayerID, PlayerName = message.PlayerName });
+                        SendMessage(new Message { HostID = window.UserID, Action = "joinAck", PlayerID = message.PlayerID, PlayerName = message.PlayerName });
                     }
-                    if (message.HostID == window.HostID && message.Action == "joinAckAck")
+                    if (message.HostID == window.UserID && message.Action == "joinAckAck")
                     {
                         Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
                         {
@@ -167,9 +167,12 @@ namespace UNO
                             window.lobby.hosts.Add(message.HostID, message.PlayerName);
                             window.lobby.reloadHostList();
                         }
-                        if (message.Action.Equals("joinAck") && window.lobby.hosts.ContainsKey(message.HostID) && message.PlayerID == window.HostID)
+                        if (message.Action.Equals("joinAck") && window.lobby.hosts.ContainsKey(message.HostID) && message.PlayerID == window.UserID)
                         {
-                            SendMessage(new Message { HostID = message.HostID, PlayerID = window.HostID, Action = "joinAckAck", PlayerName = window.lobby.clientName, Extra = recvEp.Address.ToString() });
+                            SendMessage(new Message { HostID = message.HostID, PlayerID = window.UserID, Action = "joinAckAck", PlayerName = window.lobby.clientName, Extra = recvEp.Address.ToString() });
+                            window.lobby.UnloadClient();
+                            window.lobby.HostID = message.HostID;
+                            window.lobby.LoadWaiting();
                         }
 
                     }));

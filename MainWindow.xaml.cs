@@ -43,7 +43,7 @@ namespace UNO
 
         //networking
         public UDP udpConnect;
-        public string HostID;
+        public string UserID;
 
         //------------------------------
         // Functions
@@ -55,7 +55,7 @@ namespace UNO
 
             udpConnect = new UDP { window = this };
 
-            HostID = DateTime.Now.Ticks.ToString();
+            UserID = DateTime.Now.Ticks.ToString();
 
             Keyboard.AddKeyUpHandler(this, KeyUpHandler);
             Closing += Window_Closing;

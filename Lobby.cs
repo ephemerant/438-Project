@@ -25,7 +25,7 @@ namespace UNO
         MainWindow window;
         int comcount;
         public Dictionary<string, string> hosts = new Dictionary<string, string>();
-
+        public string HostID;
 
         //------------------------------
         // Functions
@@ -82,6 +82,8 @@ namespace UNO
 
         public void LoadHost()
         {
+            HostID = window.UserID;
+
             window.hostingPlayerList.Visibility = Visibility.Visible;
 
             //load Add Hosting Label
@@ -156,7 +158,49 @@ namespace UNO
             window.hostingPlayerList.Children.Add(labelName);
             window.playerList[0].labelName = labelName;
 
-            reloadPlayerList();
+            reloadPlayerList(true);
+
+            // broadcast that we're hosting
+            var threadBroadcast = new Thread(new ThreadStart(window.udpConnect.BroadcastHost));
+            threadBroadcast.Start();
+
+            // listen for clients wanting to join
+            var threadListen = new Thread(new ThreadStart(window.udpConnect.ListenForClients));
+            threadListen.Start();
+        }
+
+        // Waiting room for the client after it has joined a host
+        public void LoadWaiting()
+        {
+            window.hostingPlayerList.Visibility = Visibility.Visible;
+
+            //load Add Hosting Label
+            var hostingLabel = Shared.LoadImage(Path.Combine(window.resourcesPath, "hostingLobby.png"), 548, 112);
+            Canvas.SetTop(hostingLabel, -25);
+            Canvas.SetLeft(hostingLabel, 100);
+            window.canvas.Children.Add(hostingLabel);
+            window.menuButtons.Add(hostingLabel);
+
+            //load Add Return to menu button (TODO: Client can dump host)
+            var returnToMenuButton = Shared.LoadImage(Path.Combine(window.resourcesPath, "returnMenu.png"), 212, 40);
+            Canvas.SetTop(returnToMenuButton, 450);
+            Canvas.SetLeft(returnToMenuButton, 250);
+            window.canvas.Children.Add(returnToMenuButton);
+            window.menuButtons.Add(returnToMenuButton);
+
+            returnToMenuButton.MouseLeftButtonUp += hostReturnToMenuButtonClick;
+            returnToMenuButton.MouseEnter += ButtonBeginHover;
+            returnToMenuButton.MouseLeave += ButtonEndHover;
+            
+            for (int x = 0; x < 10; x++)
+            {
+                var playerNumber = new Label { Content = (x + 1) + ".", Foreground = Brushes.White, FontSize = 20 };
+                Canvas.SetTop(playerNumber, 12 + (20 * x));
+                Canvas.SetLeft(playerNumber, 16);
+                window.hostingPlayerList.Children.Add(playerNumber);
+            }
+            
+            reloadPlayerList(false);
 
             // broadcast that we're hosting
             var threadBroadcast = new Thread(new ThreadStart(window.udpConnect.BroadcastHost));
@@ -215,7 +259,7 @@ namespace UNO
                 comcount++;
                 newPlayer.isComputer = true;
                 window.playerList.Add(newPlayer);
-                reloadPlayerList();
+                reloadPlayerList(true);
             }
         }
 
@@ -228,7 +272,7 @@ namespace UNO
                 Player newPlayer = new Player(inputname);
                 newPlayer.isComputer = false;
                 window.playerList.Add(newPlayer);
-                reloadPlayerList();
+                reloadPlayerList(true);
             }
         }
 
@@ -271,13 +315,14 @@ namespace UNO
             {
                 var image = (Image)e.Source;
                 window.playerList.RemoveAt((int)image.Tag);
-                reloadPlayerList();
+                reloadPlayerList(true);
             }
         }
 
-        private void reloadPlayerList()
+        private void reloadPlayerList(bool isHost)
         {
             window.hostingPlayerList.Children.Clear();
+
             //reloading the numbers each time isn't very efficient
             for (int x = 0; x < 10; x++)
             {
@@ -286,6 +331,7 @@ namespace UNO
                 Canvas.SetLeft(playerNumber, 16);
                 window.hostingPlayerList.Children.Add(playerNumber);
             }
+
             for (int x = 0; x < window.playerList.Count; x++)
             {
                 Label thisplayer;
@@ -305,7 +351,7 @@ namespace UNO
                 //Label thisplayer = new Label { Content = window.playerList[x].name, Foreground = Brushes.White, FontSize = 20 };
                 Canvas.SetTop(thisplayer, 12 + (20 * x));
                 Canvas.SetLeft(thisplayer, 50);
-                if (x > 0)
+                if (x > 0 && isHost)
                 {
                     var delete = Shared.LoadImage(Path.Combine(window.resourcesPath, "delete.png"), 20, 20);
                     delete.Tag = x;
@@ -324,7 +370,7 @@ namespace UNO
             if (e.Source != null)
             {
                 var label = (Label)e.Source;
-                window.udpConnect.SendMessage(new Message { HostID =(String)label.Tag, Action = "join", PlayerID = window.HostID, PlayerName = clientName });
+                window.udpConnect.SendMessage(new Message { HostID =(String)label.Tag, Action = "join", PlayerID = window.UserID, PlayerName = clientName });
             }
         }
 
@@ -334,7 +380,7 @@ namespace UNO
             client.isComputer = false;
             client.IP = message.Extra;
             window.playerList.Add(client);
-            reloadPlayerList();
+            reloadPlayerList(true);
         }
 
         public void reloadHostList()
