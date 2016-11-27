@@ -105,9 +105,7 @@ namespace UNO
                     var players = new List<Player>();
 
                     foreach (var player in window.playerList)
-                    {
                         players.Add(new Player { name = player.name, IP = player.IP, isComputer = player.isComputer });
-                    }
 
                     SendMessage(new Message { HostID = window.UserID, Action = "hosting", PlayerName = window.lobby.clientName, PlayerList = players });
                 }
@@ -130,7 +128,12 @@ namespace UNO
 
                     if (message.HostID == window.UserID && message.Action == "join")
                     {
-                        SendMessage(new Message { HostID = window.UserID, Action = "joinAck", PlayerID = message.PlayerID, PlayerName = message.PlayerName, PlayerList = window.playerList });
+                        var players = new List<Player>();
+
+                        foreach (var player in window.playerList)
+                            players.Add(new Player { name = player.name, IP = player.IP, isComputer = player.isComputer });
+
+                        SendMessage(new Message { HostID = window.UserID, Action = "joinAck", PlayerID = message.PlayerID, PlayerName = message.PlayerName, PlayerList = players });
                     }
                     if (message.HostID == window.UserID && message.Action == "joinAckAck")
                     {
@@ -204,13 +207,20 @@ namespace UNO
 
                     var message = new Message(text);
 
-                    if (message.Action.Equals("hosting") && window.lobby.HostID == message.HostID)
+                    if (window.lobby.HostID == message.HostID)
                     {
-                        Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
-                        {
-                            window.playerList = message.PlayerList;
-                            window.lobby.reloadPlayerList(false);
-                        }));
+                        if (message.Action == "hosting")
+                            Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
+                            {
+                                window.playerList = message.PlayerList;
+                                window.lobby.reloadPlayerList(false);
+                            }));
+                        else if (message.Action == "begin")
+                            Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
+                            {
+                                window.lobby.UnloadHost();
+                                window.StartMainScreen();
+                            }));
                     }
                 }
             }

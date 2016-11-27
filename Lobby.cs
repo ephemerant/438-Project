@@ -287,15 +287,9 @@ namespace UNO
             window.unloadHostScreen();
             window.Window_Loaded(null, null);
         }
-
-        private void joinPlayButtonClick(object sender, MouseEventArgs e)
-        {
-            window.unloadJoinScreen();
-            window.StartMainScreen();
-        }
-
+        
         private void hostPlayButtonClick(object sender, MouseEventArgs e)
-        {
+        {           
             window.unloadHostScreen();
             window.StartMainScreen();
         }

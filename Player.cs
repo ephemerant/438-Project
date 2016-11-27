@@ -13,7 +13,8 @@ namespace UNO
         // Variables
         //------------------------------
 
-        internal List<Card> hand;
+        public List<Card> hand;
+        public int CardCount;
 
         public Label labelName;
         public Label labelCards;

@@ -45,8 +45,6 @@ namespace UNO
         int currentPlayerNumber = 0;//the number of the current player.
         bool turnsReversed = false;
 
-
-
         MainWindow window;
 
         //------------------------------
@@ -66,7 +64,6 @@ namespace UNO
         public void Load(MainWindow window)
         {
             this.window = window;
-
 
             dealer = new Dealer();
 
@@ -169,6 +166,16 @@ namespace UNO
             // listen for moves
             var threadListen = new Thread(new ThreadStart(window.udpConnect.ListenForMoves));
             threadListen.Start();
+
+            if (window.lobby.HostID == window.UserID)
+            {
+                var players = new List<Player>();
+
+                foreach (var player in window.playerList)
+                    players.Add(new Player { name = player.name, IP = player.IP, isComputer = player.isComputer, CardCount = player.hand.Count });
+
+                window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = "begin", PlayerName = window.lobby.clientName, PlayerList = players });
+            }
         }
 
         // A key was pressed
