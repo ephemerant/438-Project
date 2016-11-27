@@ -25,7 +25,7 @@ namespace UNO
         // strip functions are intended to strip away image/label data for JSON serialization
         public static Card Strip(Card card)
         {
-            return card == null ? card : new Card { value = card.value, color = card.color };
+            return card == null ? card : new Card { value = card.value, color = card.color, ID = card.ID };
         }
 
         public static List<Card> Strip(List<Card> playerHand)
@@ -49,12 +49,12 @@ namespace UNO
         }
 
         // unstrip functions are intended to restore image/label data
-        public static Card Unstrip(Card card, Card[,] clientCards)
+        public static Card Unstrip(Card card, List<Card> clientCards)
         {
-            return clientCards[(int)card.color, (int)card.value];
+            return clientCards[card.ID];
         }
 
-        public static List<Card> Unstrip(List<Card> hand, Card[,] clientCards)
+        public static List<Card> Unstrip(List<Card> hand, List<Card> clientCards)
         {
             var cards = new List<Card>();
 

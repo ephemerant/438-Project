@@ -32,6 +32,8 @@ namespace UNO
         public COLOR color;
         public CARD value;
 
+        public int ID;
+
         //------------------------------
         // Functions
         //------------------------------

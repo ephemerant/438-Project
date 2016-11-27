@@ -48,7 +48,7 @@ namespace UNO
         MainWindow window;
         bool isClient = false;
 
-        Card[,] clientCards = new Card[5, 15]; // store cards by color and value
+        List<Card> cardsByID;
 
         int turnCount;
 
@@ -104,6 +104,17 @@ namespace UNO
 
             dealer = new Dealer();
 
+            foreach (var path in Directory.GetFiles(window.imagesPath))
+            {
+                // Create two of each card and store them
+                for (var i = 0; i <= 1; ++i)
+                {
+                    Card tempcard = new Card(path);
+                    tempcard.ID = cardsByID.Count;
+                    cardsByID.Add(tempcard);
+                }
+            }
+
             if (message == null)
                 LoadHost();
             else
@@ -112,17 +123,7 @@ namespace UNO
 
         public void LoadClient(Message message)
         {
-            isClient = true;
-
-            foreach (var path in Directory.GetFiles(window.imagesPath))
-            {
-                // Create two of each card and store them
-                for (var i = 1; i <= 2; ++i)
-                {
-                    Card tempcard = new Card(path);
-                    clientCards[(int)tempcard.color, (int)tempcard.value] = tempcard;
-                }
-            }
+            isClient = true;            
 
             window.playerList = message.PlayerList;
 
@@ -138,7 +139,7 @@ namespace UNO
 
                 thisplayer.labelName = labelName;
 
-                thisplayer.hand = Shared.Unstrip(thisplayer.hand, clientCards);
+                thisplayer.hand = Shared.Unstrip(thisplayer.hand, cardsByID);
 
                 var labelCards = new Label { Foreground = Brushes.White, FontSize = 14 };
 
@@ -157,7 +158,7 @@ namespace UNO
             turnsReversed = false;
 
             // Load the current card
-            currentCard = Shared.Unstrip(message.Card, clientCards);
+            currentCard = Shared.Unstrip(message.Card, cardsByID);
 
             currentPlayerNumber = 0;
             currentPlayer = window.playerList[0];
@@ -419,7 +420,7 @@ namespace UNO
             }
             else if (message.Action == "card_played")
             {
-                playCard(Shared.Unstrip(message.Card, clientCards));
+                playCard(Shared.Unstrip(message.Card, cardsByID));
             }
         }
 
