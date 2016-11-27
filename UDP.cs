@@ -113,7 +113,14 @@ namespace UNO
                     var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
 
                     var message = new Message(text);
-                                    
+                    if(message.HostID==window.HostID && message.Action == "join")
+                    {
+                        SendMessage(new Message { HostID = window.HostID, Action = "joinAck", PlayerID = message.PlayerID, PlayerName = message.PlayerName });
+                    }
+                    if (message.HostID == window.HostID && message.Action == "joinAckAck")
+                    {
+                        window.lobby.addClient(message);
+                    }
                 }
             }
             catch (Exception ex)
@@ -141,6 +148,10 @@ namespace UNO
                         {
                             window.lobby.hosts.Add(message.HostID, message.PlayerName);
                             window.lobby.reloadHostList();
+                        }
+                        if (message.Action.Equals("joinAck") && window.lobby.hosts.ContainsKey(message.HostID) && message.PlayerID == window.HostID)
+                        {
+                            SendMessage(new Message { HostID = window.HostID, Action = "joinAckAck", PlayerName = window.lobby.clientName });
                         }
 
                     }));

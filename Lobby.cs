@@ -293,6 +293,10 @@ namespace UNO
                 {
                     thisplayer = new Label { Content = window.playerList[x].name, Foreground = Brushes.Orange, FontSize = 20 };
                 }
+                else if (window.playerList[x].isComputer == false && window.playerList[x].IP !=null)
+                {
+                    thisplayer = new Label { Content = window.playerList[x].name, Foreground = Brushes.LightGreen, FontSize = 20 };
+                }
                 else
                 {
                     thisplayer = new Label { Content = window.playerList[x].name, Foreground = Brushes.LightBlue, FontSize = 20 };
@@ -322,6 +326,14 @@ namespace UNO
                 var label = (Label)e.Source;
                 window.udpConnect.SendMessage(new Message { HostID =(String)label.Tag, Action = "join", PlayerID = window.HostID, PlayerName = clientName });
             }
+        }
+
+        public void addClient(Message message)
+        {
+            Player client = new Player(message.PlayerName);
+            client.isComputer = false;
+            client.IP = message.Extra;
+            window.playerList.Add(client);
         }
 
         public void reloadHostList()
