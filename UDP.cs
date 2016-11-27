@@ -163,7 +163,7 @@ namespace UNO
                         }
                         if (message.Action.Equals("joinAck") && window.lobby.hosts.ContainsKey(message.HostID) && message.PlayerID == window.HostID)
                         {
-                            SendMessage(new Message { HostID = message.HostID, PlayerID = window.HostID, Action = "joinAckAck", PlayerName = window.lobby.clientName });
+                            SendMessage(new Message { HostID = message.HostID, PlayerID = window.HostID, Action = "joinAckAck", PlayerName = window.lobby.clientName, Extra = recvEp.Address.ToString() });
                         }
 
                     }));
