@@ -157,7 +157,7 @@ namespace UNO
 
                 thisplayer.labelName = labelName;
 
-                thisplayer.hand = Shared.Unstrip(thisplayer.hand, cardsByID);
+                dealer.Deal(thisplayer, 7);
 
                 var labelCards = new Label { Foreground = Brushes.White, FontSize = 14 };
 
@@ -176,7 +176,7 @@ namespace UNO
             turnsReversed = false;
 
             // Load the current card
-            currentCard = Shared.Unstrip(message.Card, cardsByID);
+            currentCard = dealer.Deal();
 
             currentPlayerNumber = 0;
             currentPlayer = window.playerList[0];
