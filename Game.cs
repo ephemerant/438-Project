@@ -434,7 +434,7 @@ namespace UNO
 
                     if (result) // The card can be played; play it and move to next player.
                     {
-                        playCard(draggedCard);
+                        playCard(draggedCard, true);
                     }
                     else // Card cannot be played, move card back to hand
                     {
@@ -478,11 +478,11 @@ namespace UNO
             }
             else if (message.Action == "card_played")
             {
-                playCard(Shared.Unstrip(message.Card, cardsByID));
+                playCard(Shared.Unstrip(message.Card, cardsByID), false);
             }
         }
 
-        internal void playCard(Card card)
+        internal void playCard(Card card, bool propagate)
         {
             // Add the previous card played back to the deck
             // TODO: It would probably be optimal to only do this after the deck runs out, so all cards will be drawn throughout a deck's life
@@ -545,7 +545,8 @@ namespace UNO
 
             reloadHand(); // Refresh the hand     
 
-            BroadcastMove("card_played", currentPlayer, card);
+            if (propagate)
+                BroadcastMove("card_played", currentPlayer, card);
 
             if (currentPlayer.isComputer)
             {
@@ -569,7 +570,7 @@ namespace UNO
                     if (isValidPlay(playableCard))
                     {
                         // Play the card
-                        playCard(playableCard);
+                        playCard(playableCard, true);
                         break;
                     }
             }
@@ -586,7 +587,7 @@ namespace UNO
             turnCount += 1;
 
             // player: The player whose turn it now is
-            window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = action, PlayerName = player.ID, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(card), TurnCount = turnCount.ToString() });
+            window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = action, PlayerName = player.ID, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(card), TurnCount = turnCount.ToString(), Extra = turnCount.ToString() });
         }
 
         private bool pointWithinBounds(Point point)
