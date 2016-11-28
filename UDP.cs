@@ -73,9 +73,7 @@ namespace UNO
             }
             catch (Exception ex)
             {
-                // did we force close the connection?
-                if (ex.Message != "A blocking operation was interrupted by a call to WSACancelBlockingCall")
-                    throw ex;
+                
             }
         }
 
@@ -127,9 +125,7 @@ namespace UNO
             }
             catch (Exception ex)
             {
-                // did we force close the connection?
-                if (ex.Message != "A blocking operation was interrupted by a call to WSACancelBlockingCall")
-                    throw ex;
+                
             }
         }
 
@@ -183,9 +179,7 @@ namespace UNO
             }
             catch (Exception ex)
             {
-                // did we force close the connection?
-                if (ex.Message != "A blocking operation was interrupted by a call to WSACancelBlockingCall")
-                    throw ex;
+                
             }
         }
 
@@ -225,9 +219,7 @@ namespace UNO
             }
             catch (Exception ex)
             {
-                // did we force close the connection?
-                if (ex.Message != "A blocking operation was interrupted by a call to WSACancelBlockingCall")
-                    throw ex;
+                
             }
         }
 
@@ -248,9 +240,7 @@ namespace UNO
             }
             catch (Exception ex)
             {
-                // did we force close the connection?
-                if (ex.Message != "A blocking operation was interrupted by a call to WSACancelBlockingCall")
-                    throw ex;
+                
             }
         }
     }
