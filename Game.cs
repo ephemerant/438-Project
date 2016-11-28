@@ -157,6 +157,7 @@ namespace UNO
 
                 thisplayer.labelName = labelName;
 
+                thisplayer.hand = new List<Card>();
                 dealer.Deal(thisplayer, 7);
 
                 var labelCards = new Label { Foreground = Brushes.White, FontSize = 14 };
@@ -505,6 +506,7 @@ namespace UNO
 
             if (winCheck())
             {
+                BroadcastMove("card_played", currentPlayer, card);
                 MessageBox.Show(string.Format("{0} wins!", currentPlayer.name));
                 // Go back to the menu screen
                 window.unloadMainScreen();
@@ -587,7 +589,8 @@ namespace UNO
             turnCount += 1;
 
             // player: The player whose turn it now is
-            window.udpConnect.SendMessage(new Message { HostID = window.lobby.HostID, Action = action, PlayerName = player.ID, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(card), TurnCount = turnCount.ToString(), Extra = turnCount.ToString() });
+            window.udpConnect.SendMessage(new Message { HostID = window.lobby.HostID, Action = action, Card = Shared.Strip(card), TurnCount = turnCount.ToString() });
+            //window.udpConnect.SendMessage(new Message { HostID = window.lobby.HostID, Action = action, PlayerName = player.ID, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(card), TurnCount = turnCount.ToString(), Extra = turnCount.ToString() });
         }
 
         private bool pointWithinBounds(Point point)
@@ -690,12 +693,12 @@ namespace UNO
 
         void reloadHand()
         {
-            dealer.DisplayDeck();
+            //dealer.DisplayDeck();
 
-            Console.WriteLine("\n" + currentPlayer.name);
-            foreach (var card in currentPlayer.hand)
-                Console.WriteLine(card);
-            Console.Write("\n");
+            //Console.WriteLine("\n" + currentPlayer.name);
+            //foreach (var card in currentPlayer.hand)
+            //    Console.WriteLine(card);
+            //Console.Write("\n");
 
             // Unload all the shown cards and reload the cards in the hand
             window.canvas.Children.Clear();

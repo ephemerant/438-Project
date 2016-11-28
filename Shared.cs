@@ -25,7 +25,7 @@ namespace UNO
         // strip functions are intended to strip away image/label data for JSON serialization
         public static Card Strip(Card card)
         {
-            return card == null ? card : new Card { value = card.value, color = card.color, ID = card.ID };
+            return card == null ? card : new Card { ID = card.ID };
         }
 
         public static List<Card> Strip(List<Card> playerHand)
@@ -43,7 +43,7 @@ namespace UNO
             var players = new List<Player>();
 
             foreach (var player in playerList)
-                players.Add(new Player { name = player.name, IP = player.IP, ID = player.ID, isComputer = player.isComputer, hand = Strip(player.hand) });
+                players.Add(new Player { name = player.name, IP = player.IP, ID = player.ID, isComputer = player.isComputer });
 
             return players;
         }

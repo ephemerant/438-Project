@@ -47,6 +47,11 @@ namespace UNO
 
             var data = Encoding.ASCII.GetBytes(message.ToString());
             client.Send(data, data.Length);
+            Thread.Sleep(25);
+            client.Send(data, data.Length);
+            Thread.Sleep(25);
+            client.Send(data, data.Length);
+            Thread.Sleep(25);
             client.Send(data, data.Length);
 
             client.Close();
@@ -274,7 +279,7 @@ namespace UNO
 
         public override string ToString()
         {
-            return JsonConvert.SerializeObject(this);
+            return JsonConvert.SerializeObject(this, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }).Replace(@"""color"":0,""value"":0,", "");
         }
     }
 }

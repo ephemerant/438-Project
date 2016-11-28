@@ -277,9 +277,10 @@ namespace UNO
             }
         }
 
-        //return to menu from host
+        //return to menu from client
         private void joinReturnToMenuButtonClick(object sender, MouseEventArgs e)
         {
+            window.udpConnect.udpResponse.Close();
             window.unloadJoinScreen();
             window.Window_Loaded(null, null);
         }
@@ -287,6 +288,7 @@ namespace UNO
         //return to menu from host
         private void hostReturnToMenuButtonClick(object sender, MouseEventArgs e)
         {
+            window.udpConnect.udpResponse.Close();
             window.unloadHostScreen();
             window.Window_Loaded(null, null);
         }
@@ -330,6 +332,7 @@ namespace UNO
             for (int x = 0; x < window.playerList.Count; x++)
             {
                 Label thisplayer;
+
                 if (window.playerList[x].isComputer == false && window.playerList[x].IP == null)
                 {
                     thisplayer = new Label { Content = window.playerList[x].name, Foreground = Brushes.Orange, FontSize = 20 };
