@@ -122,9 +122,6 @@ namespace UNO
                     if (message.HostID == window.UserID)
                     {
                         if (message.Action == "join")
-                            SendMessage(new Message { HostID = window.UserID, Action = "joinAck", PlayerID = message.PlayerID, PlayerName = message.PlayerName, PlayerList = Shared.Strip(window.playerList) });
-
-                        if (message.Action == "joinAckAck")
                             Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
                             {
                                 window.lobby.addClient(message);
@@ -163,19 +160,6 @@ namespace UNO
                             }
                         }));
                     }
-                    if (message.Action.Equals("joinAck") && window.lobby.hosts.ContainsKey(message.HostID) && message.PlayerID == window.UserID)
-                    {
-                        Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
-                        {
-                            SendMessage(new Message { HostID = message.HostID, PlayerID = window.UserID, Action = "joinAckAck", PlayerName = window.lobby.clientName, Extra = recvEp.Address.ToString() });
-                            window.lobby.UnloadClient();
-                            window.lobby.HostID = message.HostID;
-                            window.playerList = message.PlayerList;
-                            window.lobby.LoadWaiting();
-                        }));
-                        return;
-                    }
-
                 }
             }
             catch (Exception ex)
