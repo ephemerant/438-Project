@@ -256,7 +256,7 @@ namespace UNO
         //    foreach (var player in window.playerList)
         //        if (player.IP != null)
         //            responses.Add(player.ID, false);
-            
+
         //    if (responses.Count > 0)
         //    {
         //        var counter = 0;

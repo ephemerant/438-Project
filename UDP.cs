@@ -47,25 +47,10 @@ namespace UNO
 
             var data = Encoding.ASCII.GetBytes(message.ToString());
             client.Send(data, data.Length);
-
-            client.Close();
-        }
-
-        //alternative sendMessage with IP address
-        public void SendMessage(string message, string inputIP)
-        {
-            // send via UDP
-            UdpClient client = new UdpClient(24242, AddressFamily.InterNetwork);
-            client.EnableBroadcast = true;
-
-            IPEndPoint groupEp = new IPEndPoint(IPAddress.Parse(inputIP), 42424);
-            client.Connect(groupEp);
-
-            var data = Encoding.ASCII.GetBytes(message);
-
             client.Send(data, data.Length);
+
             client.Close();
-        }
+        }        
 
         public void ReceiveMessage()
         {
