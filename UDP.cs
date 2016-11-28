@@ -50,7 +50,7 @@ namespace UNO
             client.Send(data, data.Length);
 
             client.Close();
-        }        
+        }
 
         public void ReceiveMessage()
         {
@@ -144,8 +144,11 @@ namespace UNO
                     {
                         Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
                         {
-                            window.lobby.hosts.Add(message.HostID, message.PlayerName);
-                            window.lobby.reloadHostList();
+                            if (!window.lobby.hosts.ContainsKey(message.HostID))
+                            {
+                                window.lobby.hosts.Add(message.HostID, message.PlayerName);
+                                window.lobby.reloadHostList();
+                            }
                         }));
                     }
                     if (message.Action.Equals("joinAck") && window.lobby.hosts.ContainsKey(message.HostID) && message.PlayerID == window.UserID)
