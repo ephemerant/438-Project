@@ -735,8 +735,8 @@ namespace UNO
                     window.arrows[1].Visibility = Visibility.Visible;
             }
 
-            player.UpdateLabel();
-            currentPlayer.UpdateLabel();
+            foreach (var player in window.playerList)
+                player.UpdateLabel();
         }
 
         void BringToFront(Canvas canvas, Image image)
