@@ -736,6 +736,7 @@ namespace UNO
             }
 
             player.UpdateLabel();
+            currentPlayer.UpdateLabel();
         }
 
         void BringToFront(Canvas canvas, Image image)
