@@ -587,7 +587,7 @@ namespace UNO
             turnCount += 1;
 
             // player: The player whose turn it now is
-            window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = action, PlayerName = player.ID, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(card), TurnCount = turnCount.ToString(), Extra = turnCount.ToString() });
+            window.udpConnect.SendMessage(new Message { HostID = window.lobby.HostID, Action = action, PlayerName = player.ID, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(card), TurnCount = turnCount.ToString(), Extra = turnCount.ToString() });
         }
 
         private bool pointWithinBounds(Point point)
