@@ -51,8 +51,11 @@ namespace UNO
                 deck[k] = deck[i];
                 deck[i] = swapped;
             }
+        }
 
-            i = 1;
+        public void DisplayDeck()
+        {
+            var i = 1;
 
             foreach (var card in deck)
                 Console.WriteLine("{0}: {1}", i++, card);

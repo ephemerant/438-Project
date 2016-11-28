@@ -690,6 +690,8 @@ namespace UNO
 
         void reloadHand()
         {
+            dealer.DisplayDeck();
+
             Console.WriteLine("\n" + currentPlayer.name);
             foreach (var card in currentPlayer.hand)
                 Console.WriteLine(card);

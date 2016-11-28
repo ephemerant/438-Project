@@ -54,7 +54,7 @@ namespace UNO
 
         public override string ToString()
         {
-            return string.Format("{0} {1}", color, value);
+            return string.Format("{0} {1} ({2})", color, value, ID);
         }
 
         void LoadType(string name)
