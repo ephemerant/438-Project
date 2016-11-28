@@ -243,49 +243,59 @@ namespace UNO
 
             // let players know that we've started
             if (window.lobby.HostID == window.UserID)
-                BroadcastBegin();
+                window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = "begin", PlayerName = window.lobby.clientName, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(currentCard), Extra = seed.ToString() });
         }
 
-        public void BroadcastBegin()
-        {
-            var oldTimeout = window.udpConnect.udpResponse.Client.ReceiveTimeout;
-            window.udpConnect.udpResponse.Client.ReceiveTimeout = 50;
+        //public void BroadcastBegin()
+        //{
+        //    var oldTimeout = window.udpConnect.udpResponse.Client.ReceiveTimeout;
+        //    window.udpConnect.udpResponse.Client.ReceiveTimeout = 50;
 
-            var responses = new Dictionary<string, bool>();
+        //    var responses = new Dictionary<string, bool>();
 
-            foreach (var player in window.playerList)
-                if (player.IP != null)
-                    responses.Add(player.ID, false);
+        //    foreach (var player in window.playerList)
+        //        if (player.IP != null)
+        //            responses.Add(player.ID, false);
+            
+        //    if (responses.Count > 0)
+        //    {
+        //        var counter = 0;
 
-            while (true)
-            {
-                var heardFromAll = true;
+        //        window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = "begin", PlayerName = window.lobby.clientName, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(currentCard), Extra = seed.ToString() });
 
-                foreach (var player in window.playerList)
-                    if (player.IP != null)
-                        heardFromAll = heardFromAll && (responses[player.ID]);
+        //        while (counter <= 3)
+        //        {
+        //            try
+        //            {
+        //                IPEndPoint recvEp = new IPEndPoint(IPAddress.Any, 0);
 
-                if (heardFromAll)
-                    break;
+        //                var data = window.udpConnect.udpResponse.Receive(ref recvEp);
 
-                var counter = 0;
+        //                var text = Encoding.ASCII.GetString(data);
 
-                while (++counter <= 3)
-                {
-                    window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = "begin", PlayerName = window.lobby.clientName, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(currentCard), Extra = seed.ToString() });
+        //                var message = new Message(text);
 
-                    IPEndPoint recvEp = new IPEndPoint(IPAddress.Any, 0);
+        //                if (message.Action == "beginAck")
+        //                {
+        //                    responses[message.PlayerID] = true;
+        //                    window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = "beginAckAck" });
+        //                }
+        //            }
+        //            catch
+        //            {
+        //                if (++counter <= 3)
+        //                    window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = "begin", PlayerName = window.lobby.clientName, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(currentCard), Extra = seed.ToString() });
+        //            }
+        //        }
+        //    }
 
-                    var data = window.udpConnect.udpResponse.Receive(ref recvEp);
+        //    // kick anyone who hasn't repsonded
+        //    foreach (var player in window.playerList)
+        //        if (player.IP != null)
+        //            heardFromAll = heardFromAll && (responses[player.ID]);
 
-                    var text = Encoding.ASCII.GetString(data);
-
-                    var message = new Message(text);
-                }
-            }
-
-            window.udpConnect.udpResponse.Client.ReceiveTimeout = oldTimeout;
-        }
+        //    window.udpConnect.udpResponse.Client.ReceiveTimeout = oldTimeout;
+        //}
 
         // A key was pressed
         public override void KeyUpHandler(object sender, KeyEventArgs e)
