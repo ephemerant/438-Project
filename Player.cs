@@ -14,7 +14,6 @@ namespace UNO
         //------------------------------
 
         public List<Card> hand;
-        public int CardCount;
 
         public Label labelName;
         public Label labelCards;

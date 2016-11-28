@@ -160,10 +160,19 @@ namespace UNO
                     {
                         Application.Current.Dispatcher.BeginInvoke(new Action(delegate ()
                         {
-                            SendMessage(new Message { HostID = message.HostID, PlayerID = window.UserID, Action = "joinAckAck", PlayerName = window.lobby.clientName, Extra = recvEp.Address.ToString() });
+                            message = new Message { HostID = message.HostID, PlayerID = window.UserID, Action = "joinAckAck", PlayerName = window.lobby.clientName, Extra = recvEp.Address.ToString() };
+
+                            SendMessage(message);
                             window.lobby.UnloadClient();
                             window.lobby.HostID = message.HostID;
                             window.playerList = message.PlayerList;
+
+                            Player client = new Player(message.PlayerName);
+                            client.isComputer = false;
+                            client.IP = message.Extra;
+                            client.ID = message.PlayerID;
+                            window.playerList.Add(client);
+
                             window.lobby.LoadWaiting();
                         }));
                         return;
