@@ -690,6 +690,11 @@ namespace UNO
 
         void reloadHand()
         {
+            Console.WriteLine("\n" + currentPlayer.name);
+            foreach (var card in currentPlayer.hand)
+                Console.WriteLine(card);
+            Console.Write("\n");
+
             // Unload all the shown cards and reload the cards in the hand
             window.canvas.Children.Clear();
 
