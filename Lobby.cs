@@ -371,6 +371,10 @@ namespace UNO
 
         public void addClient(Message message)
         {
+            foreach (var player in window.playerList)
+                if (player.ID == message.PlayerID)
+                    return;
+
             Player client = new Player(message.PlayerName);
             client.isComputer = false;
             client.IP = message.Extra;
