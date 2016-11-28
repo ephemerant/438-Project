@@ -10,7 +10,6 @@ using System.ComponentModel;
 using Newtonsoft.Json;
 using System.Windows.Threading;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace UNO
 {
@@ -39,29 +38,18 @@ namespace UNO
 
         public void SendMessage(object message)
         {
-            Task.Run(() =>
-            {
-                // send via UDP
-                UdpClient client = new UdpClient(24242, AddressFamily.InterNetwork);
-                client.EnableBroadcast = true;
+            // send via UDP
+            UdpClient client = new UdpClient(24242, AddressFamily.InterNetwork);
+            client.EnableBroadcast = true;
 
-                IPEndPoint groupEp = new IPEndPoint(IPAddress.Broadcast, 42424);
-                client.Connect(groupEp);
+            IPEndPoint groupEp = new IPEndPoint(IPAddress.Broadcast, 42424);
+            client.Connect(groupEp);
 
-                var data = Encoding.ASCII.GetBytes(message.ToString());
-                client.Send(data, data.Length);
-                Thread.Sleep(10);
-                client.Send(data, data.Length);
-                Thread.Sleep(10);
-                client.Send(data, data.Length);
+            var data = Encoding.ASCII.GetBytes(message.ToString());
+            client.Send(data, data.Length);
+            client.Send(data, data.Length);
 
-                client.Close();
-            });
-        }
-
-        public void SendMessageThread()
-        {
-
+            client.Close();
         }
 
         public void ReceiveMessage()
