@@ -365,14 +365,7 @@ namespace UNO
             if (e.Source != null)
             {
                 var label = (Label)e.Source;
-
-                var message = new Message { HostID = (String)label.Tag, Action = "join", PlayerID = window.UserID, PlayerName = clientName };
-
-                window.udpConnect.SendMessage(message);
-
-                window.lobby.UnloadClient();
-                window.lobby.HostID = message.HostID;
-                window.lobby.LoadWaiting();
+                window.udpConnect.SendMessage(new Message { HostID =(String)label.Tag, Action = "join", PlayerID = window.UserID, PlayerName = clientName });
             }
         }
 
