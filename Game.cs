@@ -455,7 +455,7 @@ namespace UNO
 
         public void Process(Message message)
         {
-            if (message.TurnCount <= turnCount)
+            if (int.Parse(message.TurnCount) <= turnCount)
             {
                 // Wait for the remote player to make a move                
                 var threadListen = new Thread(new ThreadStart(window.udpConnect.ListenForMove));
@@ -464,7 +464,7 @@ namespace UNO
                 return;
             }
 
-            turnCount = message.TurnCount;
+            turnCount = int.Parse(message.TurnCount);
 
             if (message.Action == "draw")
             {
@@ -582,8 +582,10 @@ namespace UNO
 
         private void BroadcastMove(string action, Player player, Card card = null)
         {
+            turnCount += 1;
+
             // player: The player whose turn it now is
-            window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = action, PlayerName = player.ID, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(card), TurnCount = ++turnCount });
+            window.udpConnect.SendMessage(new Message { HostID = window.UserID, Action = action, PlayerName = player.ID, PlayerList = Shared.Strip(window.playerList), Card = Shared.Strip(card), TurnCount = turnCount.ToString() });
         }
 
         private bool pointWithinBounds(Point point)

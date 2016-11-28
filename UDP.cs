@@ -249,7 +249,7 @@ namespace UNO
         public string PlayerName { get; set; }
         public List<Player> PlayerList { get; set; }
         public Card Card { get; set; }
-        public int TurnCount { get; set; }
+        public string TurnCount { get; set; }
 
         public Message()
         {
