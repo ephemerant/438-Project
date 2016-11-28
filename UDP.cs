@@ -57,31 +57,6 @@ namespace UNO
             client.Close();
         }
 
-        public void ReceiveMessage()
-        {
-            try
-            {
-                while (true)
-                {
-                    IPEndPoint recvEp = new IPEndPoint(IPAddress.Any, 0);
-
-                    var text = Encoding.ASCII.GetString(udpResponse.Receive(ref recvEp));
-
-                    var message = new Message(text);
-
-                }
-            }
-            catch (Exception ex)
-            {
-                
-            }
-        }
-
-        private void EndReceive(object sender, CancelEventArgs e)
-        {
-            udpResponse.Close();
-        }
-
         public void BroadcastHost()
         {
             var counter = 0;
@@ -100,7 +75,7 @@ namespace UNO
         public void ListenForClients()
         {
             try
-            {
+            {               
                 while (window.currentScreen == window.lobby)
                 {
                     IPEndPoint recvEp = new IPEndPoint(IPAddress.Any, 0);

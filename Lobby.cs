@@ -281,6 +281,8 @@ namespace UNO
         private void joinReturnToMenuButtonClick(object sender, MouseEventArgs e)
         {
             window.udpConnect.udpResponse.Close();
+            window.udpConnect = new UDP { window = window };
+
             window.unloadJoinScreen();
             window.Window_Loaded(null, null);
         }
@@ -289,6 +291,8 @@ namespace UNO
         private void hostReturnToMenuButtonClick(object sender, MouseEventArgs e)
         {
             window.udpConnect.udpResponse.Close();
+            window.udpConnect = new UDP { window = window };
+
             window.unloadHostScreen();
             window.Window_Loaded(null, null);
         }
