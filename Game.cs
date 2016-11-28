@@ -455,7 +455,8 @@ namespace UNO
 
         public void Process(Message message)
         {
-            if (int.Parse(message.TurnCount) <= turnCount)
+            // if it's a begin message or from another host, or if the turn is out of order, discard it
+            if (message.Action == "begin" || message.HostID != window.lobby.HostID || int.Parse(message.TurnCount) <= turnCount)
             {
                 // Wait for the remote player to make a move                
                 var threadListen = new Thread(new ThreadStart(window.udpConnect.ListenForMove));
